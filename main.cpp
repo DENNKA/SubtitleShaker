@@ -109,6 +109,18 @@ void help(){
     #undef out
 }
 
+enum Mode{
+    use_pos = 1,
+    //1 << 1
+};
+
+Mode operator|(Mode a, Mode b){
+    return static_cast<Mode>(static_cast<int>(a) | static_cast<int>(b));
+}
+bool operator==(Mode a, Mode b){
+    return (a & b) == b;
+}
+
 int main(int argc, char *argv[]){
     setlocale(LC_ALL, "rus");
     std::string fileIn = "in.ass";
@@ -124,6 +136,7 @@ int main(int argc, char *argv[]){
     int intensityy = 0;
     int shakeEveryMs = 0;
     bool quiet = false;
+    bool useMove = true;
     unsigned int seed = 0;
     bool customSeed = false;
     for (int i = 1; i < argc; i++){
@@ -159,9 +172,11 @@ int main(int argc, char *argv[]){
         Intensityx,
         Intensityy,
         Quiet,
+        Mode,
 
         End
     };
+
     std::ifstream fin;
     fin.open(settingsFile);
     if(!fin.is_open()) {std::cout<<"Settings file not found, abort"<<std::endl; return 1;}
@@ -221,6 +236,11 @@ int main(int argc, char *argv[]){
                 } else
                 if (it == "-q" || it == "--quiet"){
                     settings[i][Quiet] = true;
+                } else
+                if (it == "-m" || it == "--mode"){
+                    if (elems[j + 1] == "use_pos"){
+                        settings[i][Mode] = settings[i][Mode] | use_pos;
+                    }
                 }
                 #undef it
             }
@@ -240,52 +260,30 @@ int main(int argc, char *argv[]){
             std::cout<<"subtitleShaker pathToAssFile dialogueNumber shakeEveryMs intensity";
             return 0;
     }*/
-    {
-        std::ofstream fout(fileOut);
-        std::ifstream fin(fileIn);
-        if(!fin.is_open()) {std::cout<<"File not found, abort"<<std::endl; return 1;}
-        if(!fout.is_open()) return 1;
-        while(getline(fin, str)){
-            fout<<str<<std::endl;
-        }
-    }
 
-    /*std::vector<std::string> file;
+    std::vector<std::string> file;
     {
         std::ifstream fin(fileIn);
         if(!fin.is_open()) {std::cout<<"File not found, abort"<<std::endl; return 1;}
         while(getline(fin, str)){
             file.push_back(str);
         }
-    }*/
+    }
 
     std::string tempFile = "temp.ass";
 
     for (auto it = needToProcess.rbegin(); it != needToProcess.rend(); ++it){
         dialogueCounter = 0;
 
-        fin.open(fileOut);
-        if(!fin.is_open()) {std::cout<<"File not found, abort"<<std::endl; return 1;}
-        std::ofstream fout(tempFile);
-        if(!fout.is_open()) return 1;
-        while(getline(fin, str)){
-            fout<<str<<std::endl;
-        }
-        fin.close();
-        fout.close();
-
-        fin.open(tempFile);
-        if(!fin.is_open()) {std::cout<<"File not found, abort"<<std::endl; return 1;}
-        fout.open(fileOut);
-        if(!fout.is_open()) return 1;
-
         auto& settingsi = settings[*it];
         intensityx = settingsi[Intensityx] * 2; // !
         intensityy = settingsi[Intensityy] * 2; // !
         shakeEveryMs = settingsi[ShakeEveryMs];
-        if (shakeEveryMs == 0) {std::cout<<"Error: -s can't be zero"<<std::endl; return 1;}
+        shakeEveryMs -= shakeEveryMs % 10;
+        if (shakeEveryMs == 0) {std::cout<<"Error: -s (--shake) must be at least 10"<<std::endl; return 1;}
         dialogueNumber = *it;
         quiet = settingsi[Quiet];
+        useMove = !(settingsi[Mode] == use_pos);
 
         if (!quiet){
             std::cout<<"file "<<"Файл "<<fileIn<<std::endl;
@@ -302,7 +300,10 @@ int main(int argc, char *argv[]){
         int playResY = 0;
         std::map<std::string, std::vector<std::string>> styles;
 
-        while(getline(fin, strFind)){
+
+        for (int i = 0; i < file.size(); i++){
+            int shifti = 0;
+            strFind = file[i];
             str = strFind;
             if (strFind.compare(0, 9, comparePlayResX) == 0){
                 auto elems = split(strFind, ' ');
@@ -328,8 +329,6 @@ int main(int argc, char *argv[]){
                     int newMsStart = msStart;
                     int newMsEnd = msEnd;
 
-                    shakeEveryMs -= shakeEveryMs % 10;
-
                     //int posStart = str.find(elems[1]);
                     //int posEnd = str.find(elems[2]);
                     int posStart;
@@ -348,7 +347,7 @@ int main(int argc, char *argv[]){
                         }
                     }
 
-                    int posx, posy;
+                    int posx, posy, posPos;
                     int posxString, posyString;
                     std::vector<std::string> posVec;
 
@@ -358,6 +357,7 @@ int main(int argc, char *argv[]){
                     while (!findPos){ //find or calculate position
                         for (int i = 0; i + 3 < str.length(); i++){
                             if (str[i] == '\\' && str[i + 1] == 'p' && str[i + 2] == 'o' && str[i + 3] == 's'){
+                                posPos = i + 1;
                                 for (int j = i; j < str.length(); j++){
                                     int start;
                                     int end;
@@ -426,15 +426,26 @@ int main(int argc, char *argv[]){
                     std::string newStartString;
                     std::string newEndString;
                     int counter = 0;
-                    while (newMsStart + shakeEveryMs < msEnd || counter == 0){
-                        counter++;
+                    file.erase(file.begin() + i);
+                    std::string prevStringPosX, prevStringPosY;
+                    while (newMsStart <= msEnd || counter == 0){
                         str = strFind;
-
-                        newMsEnd = newMsStart + shakeEveryMs;
-                        newStartString = getTimeStringFromMs(newMsStart);
-                        newEndString = getTimeStringFromMs(newMsEnd);
-                        str.replace(posStart, elems[1].length(), newStartString);
-                        str.replace(posEnd, elems[2].length(), newEndString);
+                        if (newMsStart + shakeEveryMs >= msEnd){ //last
+                            newStartString = getTimeStringFromMs(newMsStart);
+                            newEndString = getTimeStringFromMs(msEnd);
+                        }
+                        else{
+                            newMsEnd = newMsStart + shakeEveryMs;
+                            newStartString = getTimeStringFromMs(newMsStart);
+                            newEndString = getTimeStringFromMs(newMsEnd);
+                        }
+                        /*str.erase(posEnd, elems[2].length());
+                        str.erase(posStart, elems[1].length());
+                        str.insert(posStart, newStartString);
+                        str.insert(posEnd, newEndString);*/
+                        const int widthTime = 10;
+                        str.replace(posStart, widthTime, newStartString);
+                        str.replace(posEnd, widthTime, newEndString);
                         newMsStart += shakeEveryMs;
 
                         int newPosx = intensityx == 0 ? posx : posx + rand() % intensityx - intensityx / 2;
@@ -449,7 +460,7 @@ int main(int argc, char *argv[]){
                         auto tempPosx = posx;
                         while ((tempPosx /= 10) > 0) posxDigits++;
 
-                        str.erase(posyString, posyDigits);
+                        str.erase(posyString, posyDigits);//err
                         str.erase(posxString, posxDigits);
                         auto stringPosX = std::to_string(newPosx);
                         auto stringPosY = std::to_string(newPosy);
@@ -460,50 +471,32 @@ int main(int argc, char *argv[]){
                         str.insert(posxString, stringPosX);
                         str.insert(posyString + shifty, stringPosY);
 
-                        fout<<str<<std::endl;
+                        if (useMove){
+                            if (counter == 0){
+                                prevStringPosX = std::to_string(posx);
+                                prevStringPosY = std::to_string(posy);
+                            }
+                            str.insert(posxString, ",");
+                            str.insert(posxString, prevStringPosY);
+                            str.insert(posxString, ",");
+                            str.insert(posxString, prevStringPosX);
+                            str.erase(posPos, 3);
+                            str.insert(posPos, "move");
+
+                            prevStringPosX = stringPosX, prevStringPosY = stringPosY;
+                        }
+
+                        file.insert(file.begin() + i + shifti++, str); // ! shifti++
+                        counter++;
                     }
-                    str.replace(posStart, elems[1].length(), newEndString);
-                    newEndString = getTimeStringFromMs(msEnd);
-                    str.replace(posEnd, elems[2].length(), newEndString);
-
-                    int newPosx = intensityx == 0 ? posx : posx + rand() % intensityx - intensityx / 2; //copy paste lol (need delete this)
-                    int newPosy = intensityy == 0 ? posy : posy + rand() % intensityy - intensityy / 2;
-                    //str.replace(posxString, posVec[0].length(), std::to_string(newPosx));
-                    //str.replace(posyString, posVec[1].length(), std::to_string(newPosy));
-
-                    int posyDigits = 1;
-                    auto tempPosy = posy;
-                    while ((tempPosy /= 10) > 0) posyDigits++;
-                    int posxDigits = 1;
-                    auto tempPosx = posx;
-                    while ((tempPosx /= 10) > 0) posxDigits++;
-
-                    str.erase(posyString, posyDigits);
-                    str.erase(posxString, posxDigits);
-                    auto stringPosX = std::to_string(newPosx);
-                    auto stringPosY = std::to_string(newPosy);
-                    int shifty = 0;
-                    if (posVec[0].length() > stringPosX.length()){
-                        shifty = -1;
-                    }
-                    str.insert(posxString, stringPosX);
-                    str.insert(posyString + shifty, stringPosY);
-
-                    fout<<str<<std::endl;
                 }
-                else{
-                    fout<<str<<std::endl;
-                }
-            }
-            else{
-                fout<<str<<std::endl;
             }
         }
-        fin.close();
-        fout.close();
     }
 
-    if (remove(tempFile.c_str()) != 0) std::cout<<"Can't delete temp file, ignoring"<<std::endl;
+    std::ofstream fout(fileOut);
+    for (auto& it : file)
+        fout<<it<<std::endl;
 
     return 0;
 }
