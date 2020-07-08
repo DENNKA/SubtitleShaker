@@ -111,7 +111,7 @@ void help(){
 
 int main(int argc, char *argv[]){
     setlocale(LC_ALL, "rus");
-    std::string file = "in.ass";
+    std::string fileIn = "in.ass";
     std::string fileOut = "out.ass";
     std::string str;
     std::string strFind;
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]){
             fileOut = argv[i + 1];
         } else
         if (it == "-i" || it == "--input"){
-            file = argv[i + 1];
+            fileIn = argv[i + 1];
         } else
         if (it == "-s" || it == "--seed"){
             seed = std::stoll(argv[i + 1]);
@@ -170,6 +170,28 @@ int main(int argc, char *argv[]){
         std::string needFind("-");
         if (elems.size() == 0) continue;
         int start, end;
+        if (elems[0][0] == '-'){
+            auto pos = split(str, '-');
+            if (pos.size() == 2){
+                auto it = std::find(needToProcess.begin(), needToProcess.end(), std::stoi(pos[1]));
+                if (it != needToProcess.end()){
+                    needToProcess.erase(it);
+                    settings.erase(std::stoi(pos[1]));
+                } else std::cout<<"Syntax error, ignoring. "<<"Missing to delete: "<<std::stoi(pos[1])<<std::endl;
+            }
+            else
+            if (pos.size() == 3){
+                for (int i = std::stoi(pos[1]); i <= std::stoi(pos[2]); i++){
+                    auto it = std::find(needToProcess.begin(), needToProcess.end(), i);
+                    if (it != needToProcess.end()){
+                        needToProcess.erase(it);
+                        settings.erase(i);
+                    } else std::cout<<"Syntax error, ignoring. "<<"Missing to delete: "<<i<<std::endl;
+                }
+            }
+            else std::cout<<"Syntax error, ignoring: "<<"\"-\""<<std::endl;
+            continue;
+        }
         if (elems[0].find(needFind) != std::string::npos){
             auto pos = split(elems[0], '-');
             start = std::stoi(pos[0]);
@@ -183,22 +205,24 @@ int main(int argc, char *argv[]){
             needToProcess.push_back(i);
             settings[i].resize(End);
             for (int j = 0; j < elems.size(); j++){
-                if ((std::string)elems[j] == "-i"){
+                #define it (std::string)elems[j]
+                if (it == "-i" || it == "--intensity"){
                     settings[i][Intensityx] = std::stoi(elems[j + 1]);
                     settings[i][Intensityy] = std::stoi(elems[j + 1]);
                 } else
-                if ((std::string)elems[j] == "-ix"){
+                if (it == "-ix" || it == "--intensity_x"){
                     settings[i][Intensityx] = std::stoi(elems[j + 1]);
                 } else
-                if ((std::string)elems[j] == "-iy"){
+                if (it == "-iy" || it == "--intensity_y"){
                     settings[i][Intensityy] = std::stoi(elems[j + 1]);
                 } else
-                if ((std::string)elems[j] == "-s"){
+                if (it == "-s" || it == "--shake"){
                     settings[i][ShakeEveryMs] = std::stoi(elems[j + 1]);
                 } else
-                if ((std::string)elems[j] == "-q"){
+                if (it == "-q" || it == "--quiet"){
                     settings[i][Quiet] = true;
                 }
+                #undef it
             }
         }
     }
@@ -218,13 +242,22 @@ int main(int argc, char *argv[]){
     }*/
     {
         std::ofstream fout(fileOut);
-        std::ifstream fin(file);
+        std::ifstream fin(fileIn);
         if(!fin.is_open()) {std::cout<<"File not found, abort"<<std::endl; return 1;}
         if(!fout.is_open()) return 1;
         while(getline(fin, str)){
             fout<<str<<std::endl;
         }
     }
+
+    /*std::vector<std::string> file;
+    {
+        std::ifstream fin(fileIn);
+        if(!fin.is_open()) {std::cout<<"File not found, abort"<<std::endl; return 1;}
+        while(getline(fin, str)){
+            file.push_back(str);
+        }
+    }*/
 
     std::string tempFile = "temp.ass";
 
@@ -255,7 +288,7 @@ int main(int argc, char *argv[]){
         quiet = settingsi[Quiet];
 
         if (!quiet){
-            std::cout<<"file "<<"Файл "<<file<<std::endl;
+            std::cout<<"file "<<"Файл "<<fileIn<<std::endl;
             std::cout<<"-d Dialogue number "<<"Номер диалога "<<dialogueNumber<<std::endl;
             std::cout<<"-s Shake every n ms "<<"Трясти каждые n миллисекунд "<<shakeEveryMs<<std::endl;
             std::cout<<"-i Intensity in pixels "<<"Интенсивность в пикселях "<<"x= "<<intensityx/2<<" y= "<<intensityy/2<<std::endl;
@@ -470,7 +503,7 @@ int main(int argc, char *argv[]){
         fout.close();
     }
 
-    if (remove(tempFile.c_str()) != 0) std::cout<<"Error: can't delete temp file"<<std::endl;
+    if (remove(tempFile.c_str()) != 0) std::cout<<"Can't delete temp file, ignoring"<<std::endl;
 
     return 0;
 }
