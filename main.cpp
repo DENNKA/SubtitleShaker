@@ -70,8 +70,7 @@ void help(){
     std::cout<<"0 - English"<<std::endl;
     std::cout<<"1 - Russian"<<std::endl;
     int language;
-    std::cin>>language;
-    //--settings_file
+    std::cin>>std::noskipws>>language;
     if (language == 0){
         out("==============================================================")
         out("subtitleShaker [options]")
@@ -87,6 +86,9 @@ void help(){
         out2("-ix", "--intensity_x", "Intensity in pixels at x")
         out2("-iy", "--intensity_y", "Intensity in pixels at y")
         out2("-q", "--quiet", "Quiet mode")
+        out2("-m", "--mode", "Select mode")
+        out("   Modes:")
+        out("       use_pos   use \\pos() instead of \\move()")
         out("==============================================================")
     }
     if (language == 1){
@@ -104,6 +106,9 @@ void help(){
         out2("-ix", "--intensity_x", "Интенсивность в пикселях по x")
         out2("-iy", "--intensity_y", "Интенсивность в пикселях по y")
         out2("-q", "--quiet", "Тихий режим")
+        out2("-m", "--mode", "Выбор режима")
+        out("   Режим:")
+        out("       use_pos   использовать \\pos() вместо \\move()")
         out("==============================================================")
     }
     #undef out
