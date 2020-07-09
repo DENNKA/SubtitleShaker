@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <map>
 #include <iomanip>
+#include <cmath> //sqrt
 
 #define DEBUG
 #define d(x) std::cout<<#x<<" = "<<x<<std::endl;
@@ -320,8 +321,9 @@ int main(int argc, char *argv[]){
             }
             if (strFind.compare(0, 6, compareStyle) == 0){
                 auto elems = split(strFind, ',');
-                auto elems0 = split(elems[0], ' ');
-                styles[elems0[1]].swap(elems);
+                //auto elems0 = split(elems[0], ' ');
+                elems[0].erase(elems[0].begin(), elems[0].begin() + 7);
+                styles[elems[0]].swap(elems);
             }
             if (strFind.compare(0, 9, compareStr) == 0){
                 dialogueCounter++;
@@ -453,8 +455,13 @@ int main(int argc, char *argv[]){
                         str.replace(posEnd, widthTime, newEndString);
                         newMsStart += shakeEveryMs;
 
-                        int newPosx = intensityx == 0 ? posx : posx + rand() % intensityx - intensityx / 2;
-                        int newPosy = intensityy == 0 ? posy : posy + rand() % intensityy - intensityy / 2;
+                        int randx, randy;
+                        do{
+                            randx = intensityx == 0 ? 0 : (rand() % (intensityx + 1)) - intensityx / 2;
+                            randy = intensityy == 0 ? 0 : (rand() % (intensityy + 1)) - intensityy / 2;
+                        } while (sqrt((0 - randx) * (0 - randx) + (0 - randy) * (0 - randy)) > (intensityx + intensityy) / 2); // "circle" random
+                        int newPosx = posx + randx;
+                        int newPosy = posy + randy;
                         //str.replace(posxString, posVec[0].length(), std::to_string(newPosx));
                         //str.replace(posyString, posVec[1].length(), std::to_string(newPosy));
 
