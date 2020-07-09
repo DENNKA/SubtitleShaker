@@ -1,5 +1,6 @@
 # subtitleShaker
 ---
+### НА РУССКОМ ВНИЗУ СТРАНИЦЫ
 # Work example (subtitles in the video below) / Пример работы (субтитры снизу видео)
 ![Work example](example.gif)
 
@@ -7,7 +8,8 @@
 subtitleShaker it's a program that make .ass subtitles shaking.
 
 ## How does it work
-Program add many phrases with tag \move that makes subtitles shaking.
+Program add many phrases with tag \move that makes subtitles shaking.  
+**IMPORTANT:** due to division into phrases, programm break time-related tags (for example: \k(etc), \move, \t, \fad, \fade)
 
 ## Options
 ```
@@ -47,11 +49,11 @@ Option in settings file:
    (e.g. -11 or -15-45), lines starting with # are ignored
   - The -q option removes output
   
-  What should it be like:
-    * **Processing the first phrase (shaking every 50 milliseconds, at 5 pixels)**  
+  What should it be like:  
+  Processing the first phrase (shaking every 50 milliseconds, at 5 pixels)  
     * **1 -s 50 -i 5**  
-  Range:
-    * **Processing range of phrases (first to tenth inclusive)**  
+  Range:  
+  Processing range of phrases (first to tenth inclusive)  
     * **1-10 -s 50 -i 5**  
   Several phrases with different settings: 
     * **3 -s 20 -i 5**
@@ -82,7 +84,8 @@ Option in settings file:
 Программа позволяет трясти .ass субтитры
 
 ## Как работает
-Создает множество фраз с тегом \move что создает ощущение тряски
+Создает множество фраз с тегом \move что создает ощущение тряски  
+**ВАЖНО:** из-за разделения на фразы ломаются теги связаные со временем (например: \k(и др.), \move, \t, \fad, \fade)
 
 ## Опции  
 ```
@@ -121,11 +124,11 @@ subtitleShaker [опции]
   (например -11 или -15-45), строчки начинающиеся на # игнорируются
   - Опция -q убирает вывод
   
-  Что примерно должно получится:
-  Обработка первой фразы (тряска каждые 50 миллисекунд, в 5 пикселей)**  
-      * **1 -s 50 -i 5**  
-  Диапозон:
-  Обработка диапозона фраз (с первой по десятую включительно)**  
+  Что примерно должно получится:  
+  Обработка первой фразы (тряска каждые 50 миллисекунд, в 5 пикселей)  
+    * **1 -s 50 -i 5**  
+  Диапозон:  
+  Обработка диапозона фраз (с первой по десятую включительно)  
     * **1-10 -s 50 -i 5**  
   Несколько фраз с разными настройками: 
     * **3 -s 20 -i 5**
@@ -148,7 +151,7 @@ subtitleShaker [опции]
       * .\subtitleShaker.exe -i вашисубтитры.ass -o вывод.ass -sf settings.txt
       * вывод.ass - будет нужным нам файлом
       * PROFIT!!!
-  1. LINUX
+  1. ПИНГВИН
       * Пишем в командной строке:
       * ./subtitleShaker -i subtitle.ass -o output.ass -sf settings.txt
  
