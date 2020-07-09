@@ -191,6 +191,9 @@ int main(int argc, char *argv[]){
         std::string needFind("-");
         if (elems.size() == 0) continue;
         int start, end;
+        if (elems[0][0] == '#'){
+            continue;
+        }
         if (elems[0][0] == '-'){
             auto pos = split(str, '-');
             if (pos.size() == 2){
