@@ -5,8 +5,8 @@
 # Work example (subtitles in the video below) / Пример работы (субтитры снизу видео)
 ![Work example](example.gif)
 
-## [НА РУССКОМ](https://github.com/DENNKA/subtitleShaker/tree/master#на-русском)  
-## [ENGLISH](https://github.com/DENNKA/subtitleShaker/tree/master#на-русском)
+## [НА РУССКОМ](https://github.com/DENNKA/subtitleShaker/tree/master#на-русском-1)  
+## [ENGLISH](https://github.com/DENNKA/subtitleShaker/tree/master#english-1)
 
 ---
 
