@@ -90,6 +90,7 @@ void help(){
         out2("-m", "--mode", "Select mode")
         out("   Modes:")
         out("       use_pos   use \\pos() instead of \\move()")
+        out("       add_str   add string in begin of phrase")
         out("==============================================================")
     }
     if (language == 1){
@@ -110,6 +111,7 @@ void help(){
         out2("-m", "--mode", "Выбор режима")
         out("   Режим:")
         out("       use_pos   использовать \\pos() вместо \\move()")
+        out("       add_str   Добавить строку в начало фразы")
         out("==============================================================")
     }
     #undef out
@@ -117,14 +119,19 @@ void help(){
 
 enum Mode{
     use_pos = 1,
-    //1 << 1
+    add_str = 1 << 1,
+
+    modeEnd
 };
 
 Mode operator|(Mode a, Mode b){
     return static_cast<Mode>(static_cast<int>(a) | static_cast<int>(b));
 }
-bool operator==(Mode a, Mode b){
-    return (a & b) == b;
+bool operator==(const Mode& a, const Mode& b){
+    return a & b;
+}
+bool operator==(const int& a, const Mode& b){
+    return a & b;
 }
 
 int main(int argc, char *argv[]){
@@ -182,6 +189,8 @@ int main(int argc, char *argv[]){
 
         End
     };
+    std::map<int, std::vector<int>> modeInt;
+    std::map<int, std::vector<std::string>> modeString;
 
     std::ifstream fin;
     fin.open(settingsFile);
@@ -247,9 +256,14 @@ int main(int argc, char *argv[]){
                     settings[i][Quiet] = true;
                 } else
                 if (it == "-m" || it == "--mode"){
-                    if (elems[j + 1] == "use_pos"){
-                        settings[i][Mode] = settings[i][Mode] | use_pos;
-                    }
+                    modeString[i].resize(modeEnd);
+                    modeInt[i].resize(modeEnd);
+                    #define check(x) if (elems[j + 1] == #x){ \
+                    settings[i][Mode] = settings[i][Mode] | x;
+                    check(use_pos)}
+                    check(add_str) modeString[i][add_str] = elems[j + 2];}
+
+                    #undef check
                 }
                 #undef it
             }
@@ -281,6 +295,8 @@ int main(int argc, char *argv[]){
 
     std::string tempFile = "temp.ass";
 
+    bool shake;
+
     for (auto it = needToProcess.rbegin(); it != needToProcess.rend(); ++it){
         dialogueCounter = 0;
 
@@ -288,8 +304,10 @@ int main(int argc, char *argv[]){
         intensityx = settingsi[Intensityx] * 2; // !
         intensityy = settingsi[Intensityy] * 2; // !
         shakeEveryMs = settingsi[ShakeEveryMs];
+        if (shakeEveryMs > 0 && shakeEveryMs < 10) {std::cout<<"Warning: -s (--shake) must be at least 10, shake turn off"<<std::endl;}
+        if (shakeEveryMs < 0) {std::cout<<"Error: -s (--shake) must be at least 10"<<std::endl; return 1;}
         shakeEveryMs -= shakeEveryMs % 10;
-        if (shakeEveryMs == 0) {std::cout<<"Error: -s (--shake) must be at least 10"<<std::endl; return 1;}
+        shake = shakeEveryMs != 0;
         dialogueNumber = *it;
         quiet = settingsi[Quiet];
         useMove = !(settingsi[Mode] == use_pos);
@@ -357,6 +375,17 @@ int main(int argc, char *argv[]){
                         }
                     }
 
+                    int posDialogue = 0;
+                    for (int i = 0, counter = 0; i + 3 < str.length(); i++){
+                        if (str[i] == ','){
+                            counter++;
+                            if (counter == 9){
+                                posDialogue = i + 1;
+                                break;
+                            }
+                        }
+                    }
+
                     int posx, posy, posPos;
                     int posxString, posyString;
                     std::vector<std::string> posVec;
@@ -364,7 +393,7 @@ int main(int argc, char *argv[]){
                     bool findPos = false;
                     bool posAdded = false;
 
-                    while (!findPos){ //find or calculate position
+                    while (!findPos && shake){ //find or calculate position
                         for (int i = 0; i + 3 < str.length(); i++){
                             if (str[i] == '\\' && str[i + 1] == 'p' && str[i + 2] == 'o' && str[i + 3] == 's'){
                                 posPos = i + 1;
@@ -438,67 +467,72 @@ int main(int argc, char *argv[]){
                     int counter = 0;
                     file.erase(file.begin() + i);
                     std::string prevStringPosX, prevStringPosY;
-                    while (newMsStart <= msEnd || counter == 0){
+                    while ((newMsStart <= msEnd || counter == 0) && (shake != 0 || counter == 0)){
                         str = strFind;
-                        if (newMsStart + shakeEveryMs >= msEnd){ //last
-                            newStartString = getTimeStringFromMs(newMsStart);
-                            newEndString = getTimeStringFromMs(msEnd);
-                        }
-                        else{
-                            newMsEnd = newMsStart + shakeEveryMs;
-                            newStartString = getTimeStringFromMs(newMsStart);
-                            newEndString = getTimeStringFromMs(newMsEnd);
-                        }
-                        /*str.erase(posEnd, elems[2].length());
-                        str.erase(posStart, elems[1].length());
-                        str.insert(posStart, newStartString);
-                        str.insert(posEnd, newEndString);*/
-                        const int widthTime = 10;
-                        str.replace(posStart, widthTime, newStartString);
-                        str.replace(posEnd, widthTime, newEndString);
-                        newMsStart += shakeEveryMs;
-
-                        int randx, randy;
-                        do{
-                            randx = intensityx == 0 ? 0 : (rand() % (intensityx + 1)) - intensityx / 2;
-                            randy = intensityy == 0 ? 0 : (rand() % (intensityy + 1)) - intensityy / 2;
-                        } while (sqrt((0 - randx) * (0 - randx) + (0 - randy) * (0 - randy)) > (intensityx + intensityy) / 2); // "circle" random
-                        int newPosx = posx + randx;
-                        int newPosy = posy + randy;
-                        //str.replace(posxString, posVec[0].length(), std::to_string(newPosx));
-                        //str.replace(posyString, posVec[1].length(), std::to_string(newPosy));
-
-                        int posyDigits = 1;
-                        auto tempPosy = posy;
-                        while ((tempPosy /= 10) > 0) posyDigits++;
-                        int posxDigits = 1;
-                        auto tempPosx = posx;
-                        while ((tempPosx /= 10) > 0) posxDigits++;
-
-                        str.erase(posyString, posyDigits);//err
-                        str.erase(posxString, posxDigits);
-                        auto stringPosX = std::to_string(newPosx);
-                        auto stringPosY = std::to_string(newPosy);
-                        int shifty = 0;
-                        if (posVec[0].length() > stringPosX.length()){
-                            shifty = -1;
-                        }
-                        str.insert(posxString, stringPosX);
-                        str.insert(posyString + shifty, stringPosY);
-
-                        if (useMove){
-                            if (counter == 0){
-                                prevStringPosX = std::to_string(posx);
-                                prevStringPosY = std::to_string(posy);
+                        if (shake){
+                            if (newMsStart + shakeEveryMs >= msEnd){ //last
+                                newStartString = getTimeStringFromMs(newMsStart);
+                                newEndString = getTimeStringFromMs(msEnd);
                             }
-                            str.insert(posxString, ",");
-                            str.insert(posxString, prevStringPosY);
-                            str.insert(posxString, ",");
-                            str.insert(posxString, prevStringPosX);
-                            str.erase(posPos, 3);
-                            str.insert(posPos, "move");
+                            else{
+                                newMsEnd = newMsStart + shakeEveryMs;
+                                newStartString = getTimeStringFromMs(newMsStart);
+                                newEndString = getTimeStringFromMs(newMsEnd);
+                            }
+                            /*str.erase(posEnd, elems[2].length());
+                            str.erase(posStart, elems[1].length());
+                            str.insert(posStart, newStartString);
+                            str.insert(posEnd, newEndString);*/
+                            const int widthTime = 10;
+                            str.replace(posStart, widthTime, newStartString);
+                            str.replace(posEnd, widthTime, newEndString);
+                            newMsStart += shakeEveryMs;
 
-                            prevStringPosX = stringPosX, prevStringPosY = stringPosY;
+                            int randx, randy;
+                            do{
+                                randx = intensityx == 0 ? 0 : (rand() % (intensityx + 1)) - intensityx / 2;
+                                randy = intensityy == 0 ? 0 : (rand() % (intensityy + 1)) - intensityy / 2;
+                            } while (sqrt((0 - randx) * (0 - randx) + (0 - randy) * (0 - randy)) > (intensityx + intensityy) / 2); // "circle" random
+                            int newPosx = posx + randx;
+                            int newPosy = posy + randy;
+                            //str.replace(posxString, posVec[0].length(), std::to_string(newPosx));
+                            //str.replace(posyString, posVec[1].length(), std::to_string(newPosy));
+
+                            int posyDigits = 1;
+                            auto tempPosy = posy;
+                            while ((tempPosy /= 10) > 0) posyDigits++;
+                            int posxDigits = 1;
+                            auto tempPosx = posx;
+                            while ((tempPosx /= 10) > 0) posxDigits++;
+
+                            str.erase(posyString, posyDigits);//err
+                            str.erase(posxString, posxDigits);
+                            auto stringPosX = std::to_string(newPosx);
+                            auto stringPosY = std::to_string(newPosy);
+                            int shifty = 0;
+                            if (posVec[0].length() > stringPosX.length()){
+                                shifty = -1;
+                            }
+                            str.insert(posxString, stringPosX);
+                            str.insert(posyString + shifty, stringPosY);
+
+                            if (useMove){
+                                if (counter == 0){
+                                    prevStringPosX = std::to_string(posx);
+                                    prevStringPosY = std::to_string(posy);
+                                }
+                                str.insert(posxString, ",");
+                                str.insert(posxString, prevStringPosY);
+                                str.insert(posxString, ",");
+                                str.insert(posxString, prevStringPosX);
+                                str.erase(posPos, 3);
+                                str.insert(posPos, "move");
+
+                                prevStringPosX = stringPosX, prevStringPosY = stringPosY;
+                            }
+                        }
+                        if (settings[dialogueCounter][Mode] == add_str){
+                            str.insert(posDialogue, modeString[dialogueCounter][add_str]);
                         }
 
                         file.insert(file.begin() + i + shifti++, str); // ! shifti++

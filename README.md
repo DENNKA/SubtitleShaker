@@ -34,6 +34,7 @@ subtitleShaker [опции]
   -m          --mode   Выбор режима  
    Режим:  
        use_pos   использовать \pos() вместо \move()  
+       add_str   Добавить строку в начало фразы  
 ```
 
 ## Как использовать
@@ -109,6 +110,7 @@ Option in settings file:
   -m          --mode   Select mode
    Modes:
        use_pos   use \pos() instead of \move()
+       add_str   add string in begin of phrase
 ```
 
 ## How to use
