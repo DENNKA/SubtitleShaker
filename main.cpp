@@ -219,7 +219,7 @@ int main(int argc, char *argv[]){
                     if (it != needToProcess.end()){
                         needToProcess.erase(it);
                         settings.erase(i);
-                    } else std::cout<<"Syntax error, ignoring. "<<"Missing to delete: "<<i<<std::endl;
+                    } else std::cout<<"Missing to delete: "<<i<<". Ignoring."<<std::endl;
                 }
             }
             else std::cout<<"Syntax error, ignoring: "<<"\"-\""<<std::endl;
@@ -376,7 +376,7 @@ int main(int argc, char *argv[]){
                     }
 
                     int posDialogue = 0;
-                    for (int i = 0, counter = 0; i + 3 < str.length(); i++){
+                    for (int i = 0, counter = 0; i < str.length(); i++){
                         if (str[i] == ','){
                             counter++;
                             if (counter == 9){
@@ -505,7 +505,7 @@ int main(int argc, char *argv[]){
                             auto tempPosx = posx;
                             while ((tempPosx /= 10) > 0) posxDigits++;
 
-                            str.erase(posyString, posyDigits);//err
+                            str.erase(posyString, posyDigits);
                             str.erase(posxString, posxDigits);
                             auto stringPosX = std::to_string(newPosx);
                             auto stringPosY = std::to_string(newPosy);
