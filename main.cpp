@@ -297,6 +297,32 @@ int main(int argc, char *argv[]){
 
     bool shake;
 
+    std::string compareStyle = "Style:";
+    std::string comparePlayResX = "PlayResX:";
+    std::string comparePlayResY = "PlayResY:";
+    int playResX = 0;
+    int playResY = 0;
+    std::map<std::string, std::vector<std::string>> styles;
+
+    for (int i = 0; i < file.size(); i++){
+        int shifti = 0;
+        strFind = file[i];
+        if (strFind.compare(0, 9, comparePlayResX) == 0){
+            auto elems = split(strFind, ' ');
+            playResX = std::stoi(elems[1]);
+        }
+        if (strFind.compare(0, 9, comparePlayResY) == 0){
+            auto elems = split(strFind, ' ');
+            playResY = std::stoi(elems[1]);
+        }
+        if (strFind.compare(0, 6, compareStyle) == 0){
+            auto elems = split(strFind, ',');
+            //auto elems0 = split(elems[0], ' ');
+            elems[0].erase(elems[0].begin(), elems[0].begin() + 7);
+            styles[elems[0]].swap(elems);
+        }
+    }
+
     for (auto it = needToProcess.rbegin(); it != needToProcess.rend(); ++it){
         dialogueCounter = 0;
 
@@ -320,32 +346,10 @@ int main(int argc, char *argv[]){
             std::cout<<"-q Quiet "<<""<<(quiet ? "true" : "false")<<std::endl;
         }
 
-        std::string compareStyle = "Style:";
-        std::string comparePlayResX = "PlayResX:";
-        std::string comparePlayResY = "PlayResY:";
-        int playResX = 0;
-        int playResY = 0;
-        std::map<std::string, std::vector<std::string>> styles;
-
-
         for (int i = 0; i < file.size(); i++){
             int shifti = 0;
             strFind = file[i];
             str = strFind;
-            if (strFind.compare(0, 9, comparePlayResX) == 0){
-                auto elems = split(strFind, ' ');
-                playResX = std::stoi(elems[1]);
-            }
-            if (strFind.compare(0, 9, comparePlayResY) == 0){
-                auto elems = split(strFind, ' ');
-                playResY = std::stoi(elems[1]);
-            }
-            if (strFind.compare(0, 6, compareStyle) == 0){
-                auto elems = split(strFind, ',');
-                //auto elems0 = split(elems[0], ' ');
-                elems[0].erase(elems[0].begin(), elems[0].begin() + 7);
-                styles[elems[0]].swap(elems);
-            }
             if (strFind.compare(0, 9, compareStr) == 0){
                 dialogueCounter++;
                 if (dialogueCounter == dialogueNumber){
