@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="src" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -22,6 +23,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="src" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -33,6 +35,19 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
+		<Unit filename="src/ASSInfo.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/Dialog.cpp" />
+		<Unit filename="src/Dialog.h" />
+		<Unit filename="src/Operation.cpp" />
+		<Unit filename="src/Operation.h" />
+		<Unit filename="src/Style.cpp" />
+		<Unit filename="src/Style.h" />
+		<Unit filename="src/SubtitleShaker.cpp" />
+		<Unit filename="src/SubtitleShaker.h" />
+		<Unit filename="src/assheader.cpp" />
+		<Unit filename="src/assheader.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
