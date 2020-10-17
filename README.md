@@ -19,7 +19,7 @@
 
 ## Опции  
 ```
-subtitleShaker [опции]  
+SubtitleShaker [опции]  
   -h          --help   Помощь  
   -i         --input   Исходный файл  
   -o        --output   Файл для вывода  
@@ -79,12 +79,12 @@ subtitleShaker [опции]
   1. ВИНДА
       * Shift + ПКМ по пустому месту в текущей папке
       * Жмем "открыть окно PowerShell здесь" (может быть немного по другому). Вводим в консоль следующую строчку с изменением параметров на свои:
-      * .\subtitleShaker.exe -i вашисубтитры.ass -o вывод.ass -sf settings.txt
+      * .\SubtitleShaker.exe -i вашисубтитры.ass -o вывод.ass -sf settings.txt
       * вывод.ass - будет нужным нам файлом
       * PROFIT!!!
   1. ПИНГВИН
       * Пишем в командной строке:
-      * ./subtitleShaker -i subtitle.ass -o output.ass -sf settings.txt
+      * ./SubtitleShaker -i subtitle.ass -o output.ass -sf settings.txt
  
 # ENGLISH
 subtitleShaker it's a program that make .ass subtitles shaking.
@@ -95,7 +95,7 @@ Program add many phrases with tag \move that makes subtitles shaking.
 
 ## Options
 ```
-subtitleShaker [options]
+SubtitleShaker [options]
   -h          --help   Help
   -i         --input   Input file
   -o        --output   Output file
@@ -156,9 +156,9 @@ Option in settings file:
   1. WINDOWS
       * Shift + Right click in folder
       * Click "open PowerShell window here" or "open command window here" and type with replacement for your parameters:
-      * .\subtitleShaker.exe -i yoursubtitle.ass -o output.ass -sf settings.txt
+      * .\SubtitleShaker.exe -i yoursubtitle.ass -o output.ass -sf settings.txt
       * Open output.ass
       * PROFIT!!!
   1. LINUX
       * In command line:
-      * ./subtitleShaker -i subtitle.ass -o output.ass -sf settings.txt
+      * ./SubtitleShaker -i subtitle.ass -o output.ass -sf settings.txt

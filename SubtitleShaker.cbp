@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SubtitleShaker" />
+		<Option pch_mode="2" />
+		<Option compiler="windows32" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/SubtitleShaker" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="windows32" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-std=c++1z" />
+					<Add option="-std=c++17" />
+					<Add directory="src" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/SubtitleShaker" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="windows32" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="src" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-m32" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Linker>
+			<Add option="-m32" />
+			<Add option="-static-libstdc++" />
+			<Add option="-static-libgcc" />
+			<Add option="-static" />
+			<Add option="-lstdc++fs" />
+		</Linker>
+		<Unit filename="src/ASSInfo.h">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="src/Debug.cpp" />
+		<Unit filename="src/Debug.h" />
+		<Unit filename="src/Dialog.cpp" />
+		<Unit filename="src/Dialog.h" />
+		<Unit filename="src/Operation.cpp" />
+		<Unit filename="src/Operation.h" />
+		<Unit filename="src/Style.cpp" />
+		<Unit filename="src/Style.h" />
+		<Unit filename="src/SubtitleShaker.cpp" />
+		<Unit filename="src/SubtitleShaker.h" />
+		<Unit filename="src/assheader.cpp" />
+		<Unit filename="src/assheader.h" />
+		<Unit filename="src/main.cpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
