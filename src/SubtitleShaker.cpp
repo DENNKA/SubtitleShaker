@@ -123,14 +123,14 @@ int SubtitleShaker::tryFindFiles(){
         }
     }
     if (settingsFile.empty() && settingsFileNames.size() != 0){
-        debug.out(Lang::en, L"Write number settings file:\n");
-        debug.out(Lang::ru, L"Напиши номер файла настроек:\n");
+        debug.out(Lang::en, L"Write number settings file:\n0 if don't use settings file\n");
+        debug.out(Lang::ru, L"Напиши номер файла настроек:\n0 если не использовать файл настроек\n");
         for (int i = 0; i < settingsFileNames.size(); i++){
             std::wcout << std::to_wstring(i + 1) << ' ' << converter.from_bytes(settingsFileNames[i]) << std::endl;
         }
         int txtNumber;
         std::cin >> txtNumber;
-        if (txtNumber - 1 < settingsFileNames.size()){
+        if (txtNumber != 0 && txtNumber - 1 < settingsFileNames.size()){
             settingsFile = settingsFileNames[txtNumber - 1];
             loadSettings(settingsFile);
         }
@@ -330,7 +330,6 @@ int SubtitleShaker::startProccesing(){
                 time -= time % 10;
                 int intensityX = dGetInt(IntensityX) * 2; // !
                 int intensityY = dGetInt(IntensityY) * 2; // !
-                bool verbose = (bool)dGetInt(Verbose);
                 auto dialog = dialogues[i];
                 #define INT(x) (x == "" ? 0 : std::stoi(x))
                 auto marginL = INT(dialog.format[Dialog::MarginL]);
@@ -338,6 +337,11 @@ int SubtitleShaker::startProccesing(){
                 auto marginV = INT(dialog.format[Dialog::MarginV]);
                 auto start = dialog.getStartMs();
                 auto end = dialog.getEndMs();
+                if (assHeader.format[ASSHeader::PlayResX] == "" || assHeader.format[ASSHeader::PlayResY] == ""){
+                    debug.error(Lang::en, L"Can't find PlayRes please add video file to subtitles\n");
+                    debug.error(Lang::ru, L"Невозможно определить PlayRes добавьте видео файл к субтитрам\n");
+                    return 1;
+                }
                 auto pos = styles.at(dialog.format[Dialog::Style]).calculatePosition(
                     std::stoi(assHeader.format[ASSHeader::PlayResX]),
                     std::stoi(assHeader.format[ASSHeader::PlayResY]),
@@ -431,13 +435,13 @@ int SubtitleShaker::startProccesing(){
             }
         }
     }
-    catch(std::invalid_argument &e){
+    /*catch(std::invalid_argument &e){
         debug.exception(e);
         debug.error(Lang::en, L"Check input, maybe invalid argument:");
         debug.error(Lang::ru, L"Проверьте входные данные, возможный неправильный аргумент:");
         debug.error(latestDGet);
         return 1;
-    }
+    }*/
     catch(std::out_of_range &e){
         debug.exception(e);
         debug.error(Lang::en, L"Out of range, maybe invalid argument:");
@@ -445,11 +449,11 @@ int SubtitleShaker::startProccesing(){
         debug.error(latestDGet);
         return 1;
     }
-    catch(std::exception &e){
+    /*catch(std::exception &e){
         std::cerr << "Caught " << e.what() << std::endl;
         std::cerr << "Type " << typeid(e).name() << std::endl;
         return 1;
-    }
+    }*/
     if (writeFile(fileOut, out) != 0) return 0;
     return 0;
 }

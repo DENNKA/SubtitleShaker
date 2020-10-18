@@ -33,7 +33,7 @@ void ASSHeader::setHeader(std::vector<std::string>& header, std::string version)
     if (!findedSubtitleShaker){
         this->header.push_back(textSubtitleShaker);
         this->header.push_back("Version: " + version);
-        this->header.push_back("Link: github.com/DENNKA/subtitleShaker.git");
+        this->header.push_back("Link: github.com/DENNKA/SubtitleShaker.git");
         this->header.push_back("");
     }
 }
