@@ -278,6 +278,11 @@ int SubtitleShaker::loadSubtitleFileInfo(){
             strErase(textDialogue);
             dialogues.push_back(Dialog(textDialogue + ' ',str));
         }
+        else
+        ifCompare(textComment){
+            strErase(textComment);
+            dialogues.push_back(Dialog(textComment + ' ',str));
+        }
     }
     return 0;
 }
@@ -342,14 +347,23 @@ int SubtitleShaker::startProccesing(){
                     debug.error(Lang::ru, L"Невозможно определить PlayRes добавьте видео файл к субтитрам\n");
                     return 1;
                 }
-                auto pos = styles.at(dialog.format[Dialog::Style]).calculatePosition(
-                    std::stoi(assHeader.format[ASSHeader::PlayResX]),
-                    std::stoi(assHeader.format[ASSHeader::PlayResY]),
-                    marginL || marginR || marginV,
-                    marginL, marginR, marginV
-                );
-                auto x = pos.first;
-                auto y = pos.second;
+                int x, y;
+                const auto& parseTagPos = dialog.parseAssTag("\\pos", true);
+                if (parseTagPos.first == 0){
+                    x = INT(parseTagPos.second[0]);
+                    y = INT(parseTagPos.second[1]);
+                    dialogues[i] = dialog;
+                }
+                else{
+                    auto pos = styles.at(dialog.format[Dialog::Style]).calculatePosition(
+                        std::stoi(assHeader.format[ASSHeader::PlayResX]),
+                        std::stoi(assHeader.format[ASSHeader::PlayResY]),
+                        marginL || marginR || marginV,
+                        marginL, marginR, marginV
+                    );
+                    x = pos.first;
+                    y = pos.second;
+                }
                 auto newStart = start;
                 auto newEnd = start + time;
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "Operation.h"
 
@@ -21,6 +22,7 @@ class Dialog
         void addTextInEnd(std::string text);
         void addAssTag(const std::string& tag, const std::vector<int> numbers);
         void addAssTag(const std::string& tag, const std::vector<std::string> numbers);
+        std::pair<int, std::vector<std::string>> parseAssTag(const std::string& tag, bool erase = false);
         enum Format{
             Type,
             Layer,

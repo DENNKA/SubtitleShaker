@@ -53,6 +53,25 @@ void Dialog::addAssTag(const std::string& tag, const std::vector<std::string> nu
     addTextInBegin("{\\"+ tag + "(" + operation.uniteStrings(numbers, ',', false) + ")}");
 }
 
+std::pair<int, std::vector<std::string>> Dialog::parseAssTag(const std::string& tag, bool erase){
+    std::vector<std::string> numbers;
+    auto& text = format[Text];
+    std::size_t tagPosition = text.find(tag);
+    if (tagPosition == std::string::npos) return std::make_pair(1, numbers);
+    std::size_t tagStart = text.find("(", tagPosition);
+    if (tagStart == std::string::npos) return std::make_pair(1, numbers);
+    std::size_t tagEnd = text.find(")", tagStart);
+    if (tagEnd == std::string::npos) return std::make_pair(1, numbers);
+    std::string textNumbers(text, tagStart + 1, tagEnd - tagStart - 1);
+    if (erase){
+        text.erase(tagPosition, tagEnd);
+    }
+    //erase spaces
+    textNumbers.erase(std::remove_if(std::begin(textNumbers), std::end(textNumbers),[l = std::locale{}](auto ch) { return std::isspace(ch, l); }), std::end(textNumbers));
+    numbers = operation.split(textNumbers, ',');
+    return std::make_pair(0, numbers);
+}
+
 Dialog::~Dialog()
 {
     //dtor
