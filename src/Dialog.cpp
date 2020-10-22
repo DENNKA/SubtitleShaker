@@ -67,7 +67,7 @@ std::pair<int, std::vector<std::string>> Dialog::parseAssTag(const std::string& 
         text.erase(tagPosition, tagEnd);
     }
     //erase spaces
-    textNumbers.erase(std::remove_if(std::begin(textNumbers), std::end(textNumbers),[l = std::locale{}](auto ch) { return std::isspace(ch, l); }), std::end(textNumbers));
+    textNumbers.erase(remove_if(textNumbers.begin(), textNumbers.end(), isspace), textNumbers.end());
     numbers = operation.split(textNumbers, ',');
     return std::make_pair(0, numbers);
 }
