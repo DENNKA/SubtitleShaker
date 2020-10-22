@@ -11,7 +11,7 @@ SRC_PATH = ./src
 # Space-separated pkg-config libraries used by this project
 LIBS = 
 # General compiler flags
-COMPILE_FLAGS = -Wall -Wextra
+COMPILE_FLAGS = -Wall -Wextra -std=c++1z
 # Additional release-specific flags
 #RCOMPILE_FLAGS = -D NDEBUG
 RCOMPILE_FLAGS =
