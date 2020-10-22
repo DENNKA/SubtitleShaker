@@ -1,6 +1,9 @@
 #ifndef SUBTITLESHAKER_H
 #define SUBTITLESHAKER_H
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
