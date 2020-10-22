@@ -21,7 +21,7 @@ DCOMPILE_FLAGS = -g
 # Add additional include paths
 INCLUDES = -I $(SRC_PATH)
 # General linker settings
-LINK_FLAGS = -lstdc++fs -static
+LINK_FLAGS = -lstdc++fs -static -lboost_system -pthread
 # Additional release-specific linker settings
 RLINK_FLAGS =
 # Additional debug-specific linker settings

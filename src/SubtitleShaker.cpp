@@ -75,7 +75,7 @@ int SubtitleShaker::tryFindFiles(){
         }
         else{
             debug.error(Lang::en, L"No input file\n");
-            debug.error(Lang::en, L"Нет файла на вход\n");
+            debug.error(Lang::ru, L"Нет файла на вход\n");
             return 1;
         }
     }
@@ -414,8 +414,16 @@ int SubtitleShaker::startProccesing(){
                             prevX = x + xRand;
                             prevY = y + yRand;
                         } else
-                        if (dGet(i) == "masa"){
+                        if (dGet(i) == "translate"){
+                            addParse("-f", "--from")
+                            addParse("-t", "--to")
+                            parse;
+                            std::string from = parseVector[0].getParse();
+                            std::string to = parseVector[1].getParse();
+                            translator.setLang(from, to);
+                            auto get = translator.translate(dialog.format[Dialog::Text]);
 
+                            //work in progress
                         } else
                         if (dGet(i) == "add_str"){
                             addParse("-b", "--begin")
