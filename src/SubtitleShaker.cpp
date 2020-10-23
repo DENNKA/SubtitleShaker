@@ -391,10 +391,11 @@ int SubtitleShaker::startProccesing(){
                             for (auto& it : parseVector){\
                                 if (dGet(j) == it.arg || dGet(j) == it.argLong) {it.parse = dGet(j + 1); j++;}\
                             }\
-                        }\
-
-                        dialog.setStartMs(newStart);
-                        dialog.setEndMs(newEnd);
+                        }
+                        if (time != 0){
+                            dialog.setStartMs(newStart);
+                            dialog.setEndMs(newEnd);
+                        }
                         if (dGet(i) == "shake"){
                             bool modeSettings = true;
 
