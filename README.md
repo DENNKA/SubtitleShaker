@@ -3,7 +3,7 @@
   
 ---
 
-# Work example / Пример работы 
+# Work example (on site gif have lags but you can download) / Пример работы (на сайте гифка лагает, но можно скачать)
 ![Work example](shaking_example.gif)
 
 ## [НА РУССКОМ](https://github.com/DENNKA/subtitleShaker/tree/master#на-русском-1)  
