@@ -3,8 +3,8 @@
   
 ---
 
-# Work example (subtitles in the video below) / Пример работы (субтитры снизу видео)
-![Work example](example.gif)
+# Work example / Пример работы 
+![Work example](shaking_example.gif)
 
 ## [НА РУССКОМ](https://github.com/DENNKA/subtitleShaker/tree/master#на-русском-1)  
 ## [ENGLISH](https://github.com/DENNKA/subtitleShaker/tree/master#english-1)
