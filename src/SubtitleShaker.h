@@ -38,7 +38,7 @@ class SubtitleShaker
     protected:
 
     private:
-        const std::string version = "2.0.0";
+        const std::string version = "2.1.0";
         int parseArg(std::vector<std::string> argv);
         Operation operation;
         ASSHeader assHeader;

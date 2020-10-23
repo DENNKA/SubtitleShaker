@@ -151,51 +151,72 @@ int SubtitleShaker::tryFindFiles(){
 }
 
 void SubtitleShaker::help(){
-    #define out(x) std::wcout<<x<<std::endl;
-    #define out2(shortOption, option, description) std::wcout<<std::setw(4)<<shortOption<<std::setw(16)<<option<<"   "<<description<<std::endl;
+    #define out(x) std::wcout<<L##x<<std::endl;
+    #define outOption(shortOption, option, description) std::wcout<<std::setw(4)<<std::right<<L##shortOption<<std::setw(16)<<L##option<<L"   "<<L##description<<std::endl;
+    #define outMode(mode, description) std::wcout<<L"        "<<std::setw(16)<<std::left<<L##mode<<L" "<<L##description<<std::endl;
+    #define outModeO(shortOption, option, description) std::wcout<<L"           "<<std::setw(4)<<L##shortOption<<std::setw(16)<<L##option<<L"   "<<L##description<<std::endl;
+    #define next std::wcout<<std::endl;
     Lang lang = debug.getLang();
     if (lang == Lang::en){
-        out(L"==============================================================")
-        out(L"subtitleShaker [options]")
-        out2(L"-h", "--help", "Help")
-        out2(L"-i", "--input", "Input file")
-        out2(L"-o", "--output", "Output file")
-        out2(L"-sf", "--settings_file", "Settings file")
-        out2(L"-v", "--verbose", "More verbose output")
-        out2(L"-s", "--seed", "Seed for random")
-        out(L"==============================================================")
-        out(L"Strings process options:")
-        out2(L"-s", "--shake", "Shake every n ms")
-        out2(L"-i", "--intensity", "Intensity in pixels")
-        out2(L"-ix", "--intensity_x", "Intensity in pixels at x")
-        out2(L"-iy", "--intensity_y", "Intensity in pixels at y")
-        out2(L"-m", "--mode", "Select mode")
-        out(L"   Modes:")
-        out(L"       add_str   add string in begin of phrase")
-        out(L"==============================================================")
+        out("==============================================================")
+        out("SubtitleShaker [options]")
+        outOption("-h", "--help", "Help")
+        outOption("-i", "--input", "Input file")
+        outOption("-o", "--output", "Output file")
+        outOption("-sf", "--settings_file", "Settings file")
+        outOption("-v", "--verbose", "More verbose output")
+        outOption("-s", "--seed", "Seed for random")
+        out("==============================================================")
+        out("Strings process options:")
+        outOption("-s", "--shake", "Shake every n ms")
+        outOption("-i", "--intensity", "Intensity in pixels")
+        outOption("-ix", "--intensity_x", "Intensity in pixels at x")
+        outOption("-iy", "--intensity_y", "Intensity in pixels at y")
+        outOption("-t", "--time", "Time between two phrases (need to division)")
+        outOption("-m", "--mode", "Select mode")
+        out("   Modes:")
+        outMode("add_str", "Add string in begin or end phrase")
+        outModeO("-b", "--begin", "Add in begin")
+        outModeO("-e", "--end", "Add in end")
+        next
+        outMode("translate", "Translate dialogues")
+        outModeO("-f", "--from", "Source language")
+        outModeO("-t0", "--to", "End language WORK ONLY ru")
+        next
+        outOption("-q", "--quiet", "Deleted")
+        out("==============================================================")
     }
     if (lang == Lang::ru){
-        out(L"==============================================================")
-        out(L"subtitleShaker [опции]")
-        out2(L"-h", "--help", "Помощь")
-        out2(L"-i", "--input", "Исходный файл")
-        out2(L"-o", "--output", "Файл для вывода")
-        out2(L"-sf", "--settings_file", "Файл настроек")
-        out2(L"-v", "--verbose", "Более подробный вывод")
-        out2(L"-s", "--seed", "Семя для генерации случайных чисел")
-        out(L"==============================================================")
-        out(L"Опции обработки строк:")
-        out2(L"-s", "--shake", "Трясти каждые n миллисекунд")
-        out2(L"-i", "--intensity", "Интенсивность в пикселях")
-        out2(L"-ix", "--intensity_x", "Интенсивность в пикселях по x")
-        out2(L"-iy", "--intensity_y", "Интенсивность в пикселях по y")
-        out2(L"-m", "--mode", "Выбор режима")
-        out(L"   Режим:")
-        out(L"       add_str   Добавить строку в начало фразы")
-        out(L"==============================================================")
+        out("==============================================================")
+        out("SubtitleShaker [опции]")
+        outOption("-h", "--help", "Помощь")
+        outOption("-i", "--input", "Исходный файл")
+        outOption("-o", "--output", "Файл для вывода")
+        outOption("-sf", "--settings_file", "Файл настроек")
+        outOption("-v", "--verbose", "Более подробный вывод")
+        outOption("-s", "--seed", "Семя для генерации случайных чисел")
+        out("==============================================================")
+        out("Опции обработки строк:")
+        outOption("-s", "--shake", "Трясти каждые n миллисекунд")
+        outOption("-i", "--intensity", "Интенсивность в пикселях")
+        outOption("-ix", "--intensity_x", "Интенсивность в пикселях по x")
+        outOption("-iy", "--intensity_y", "Интенсивность в пикселях по y")
+        outOption("-m", "--mode", "Выбор режима")
+        out("   Режимы:")
+        outMode("add_str", "Добавить строку в начало или конец фразы")
+        outModeO("-b", "--begin", "В начало")
+        outModeO("-e", "--end", "В конец")
+        next
+        outMode("translate", "Перевод диалогов")
+        outModeO("-f", "--from", "С языка")
+        outModeO("-t0", "--to", "На язык РАБОТАЕТ ТОЛЬКО ru")
+        next
+        outOption("-q", "--quiet", "Удален")
+        out("==============================================================")
     }
+    #undef outMode
     #undef out
-    #undef out2
+    #undef outOption
 }
 
 int SubtitleShaker::parseSettings(){
