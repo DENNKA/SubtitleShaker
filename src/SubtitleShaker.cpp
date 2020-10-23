@@ -61,7 +61,11 @@ int SubtitleShaker::tryFindFiles(){
     }
 
     if (fileIn.empty()){
-        if (fileNames.size() == 0) return 1;
+        if (fileNames.size() == 0){
+            debug.error(Lang::en, L"Can't find .ass files\n");
+            debug.error(Lang::ru, L"Файлы .ass не найдены\n");
+            return 1;
+        }
         debug.out(Lang::en, L"Write number subtitles file:\n");
         debug.out(Lang::ru, L"Напиши номер файла субтитров:\n");
         for (int i = 0; i < fileNames.size(); i++){
@@ -203,7 +207,12 @@ int SubtitleShaker::readFile(const std::string& fileName, std::vector<std::strin
     file.reserve(100);
     std::ifstream fin;
     fin.open(fileName);
-    if(!fin.is_open()) {std::cout<<fileName<<" file not found, abort"<<std::endl; return 1;}
+    if(!fin.is_open()){
+        debug.error(fileName);
+        debug.error(Lang::en, L"file not found\n");
+        debug.error(Lang::ru, L"файл не найден\n");
+        return 1;
+    }
     std::string str;
     while(getline(fin, str)){
         file.push_back(str);
@@ -214,8 +223,17 @@ int SubtitleShaker::readFile(const std::string& fileName, std::vector<std::strin
 int SubtitleShaker::writeFile(const std::string& fileName, const std::vector<std::string>& file){
     std::ofstream fout;
     fout.open(fileName);
-    if(fileName.empty()) {std::wcout<<L"Not setted output file!"<<std::endl; return 1;}
-    if(!fout.is_open()) {std::wcout<<converter.from_bytes(fileName)<<L" file not found, abort"<<std::endl; return 1;}
+    if(fileName.empty()){
+        debug.error(Lang::en, L"Not setted output file\n");
+        debug.error(Lang::ru, L"Не назначен файл вывода\n");
+        return 1;
+    }
+    if(!fout.is_open()){
+        debug.error(fileName);
+        debug.error(Lang::en, L"file not found\n");
+        debug.error(Lang::ru, L"файл не найден\n");
+        return 1;
+    }
     for (auto& it : file){
         fout<<it<<"\n";
     }
@@ -223,7 +241,11 @@ int SubtitleShaker::writeFile(const std::string& fileName, const std::vector<std
 }
 
 int SubtitleShaker::loadSubtitleFileInfo(){
-    if (file.empty()) {std::cerr<< "Input file empty" << std::endl; return 1;}
+    if (file.empty()){
+        debug.error(Lang::en, L"Input file empty\n");
+        debug.error(Lang::ru, L"Входной файл пуст\n");
+        return 1;
+    }
     for (int i = 0; i < file.size(); i++){
         const auto strFull = file[i];
         auto str = file[i];
@@ -391,10 +413,11 @@ int SubtitleShaker::startProccesing(){
                             for (auto& it : parseVector){\
                                 if (dGet(j) == it.arg || dGet(j) == it.argLong) {it.parse = dGet(j + 1); j++;}\
                             }\
-                        }\
-
-                        dialog.setStartMs(newStart);
-                        dialog.setEndMs(newEnd);
+                        }
+                        if (time != 0){
+                            dialog.setStartMs(newStart);
+                            dialog.setEndMs(newEnd);
+                        }
                         if (dGet(i) == "shake"){
                             bool modeSettings = true;
 
@@ -581,8 +604,10 @@ int SubtitleShaker::parseArg(std::vector<std::string> argv){
 
         if (it == "-sf" || it == "--settings_file"){
             settingsFile = argv[i + 1];
-            auto state = loadSettings(settingsFile);
-            if (state != 0) return state;
+            if (argv[i + 1] != "0"){
+                auto state = loadSettings(settingsFile);
+                if (state != 0) return state;
+            }
             i++;
         } else
         if (it == "-o" || it == "--output"){
