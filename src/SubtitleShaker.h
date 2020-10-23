@@ -18,6 +18,7 @@
 #include "Style.h"
 #include "Dialog.h"
 #include "Debug.h"
+#include "Translator.h"
 
 class SubtitleShaker
 {
@@ -41,6 +42,7 @@ class SubtitleShaker
         int parseArg(std::vector<std::string> argv);
         Operation operation;
         ASSHeader assHeader;
+        Translator translator;
         bool verbose = false;
         std::vector<std::string> argv;
         std::string settingsFile;
