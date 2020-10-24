@@ -19,9 +19,9 @@ DCOMPILE_FLAGS = -g -D DEBUG
 # Add additional include paths
 INCLUDES = -I $(SRC_PATH)
 # General linker settings
-LINK_FLAGS = -static -pthread -lstdc++fs -lboost_system -lpthread
+LINK_FLAGS = -pthread -lstdc++fs -lboost_system -lpthread
 # Additional release-specific linker settings
-RLINK_FLAGS =
+RLINK_FLAGS = -static
 # Additional debug-specific linker settings
 DLINK_FLAGS =
 # Destination directory, like a jail or mounted system
