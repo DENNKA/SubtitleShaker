@@ -84,8 +84,6 @@ void Translator::setLang(std::string languageFrom, std::string languageTo){
 
 std::wstring Translator::translate(std::string str){
     //https://mymemory.translated.net/doc/spec.php
-    std::string languageFrom = "en";
-    std::string languageTo = "ru";
     const std::string host = "api.mymemory.translated.net";
     const std::string target = "/get?q=" + urlencode(str) + "&langpair=" + languageFrom + "|" + languageTo;
     auto response = internet.get(host, target);
