@@ -38,7 +38,9 @@ class SubtitleShaker
     protected:
 
     private:
-        const std::string version = "2.1.0";
+        #define SS_MACROS_TO_STRING_2(x) #x
+        #define SS_MACROS_TO_STRING(x) SS_MACROS_TO_STRING_2(x)
+        const std::string version = SS_MACROS_TO_STRING(GIT_VERSION);
         int parseArg(std::vector<std::string> argv);
         Operation operation;
         ASSHeader assHeader;

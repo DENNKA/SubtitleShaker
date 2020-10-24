@@ -649,6 +649,10 @@ int SubtitleShaker::parseArg(std::vector<std::string> argv){
         if (it == "-v" || it == "--verbose"){
             verbose = true;
         } else
+        if (it == "--version"){
+            std::wcout << std::wstring(version.begin(), version.end()) << std::endl;
+            return 1337;
+        } else
         if (currentString != -1){
             auto& settingsCurrent = SubtitleShaker::settings[currentString];
             #define settings(x, set)\

@@ -122,32 +122,24 @@ endif
 
 # Version macros
 # Comment/remove this section to remove versioning
-USE_VERSION := false
-# If this isn't a git repo or the repo has no tags, git describe will return non-zero
-ifeq ($(shell git describe > /dev/null 2>&1 ; echo $$?), 0)
-	USE_VERSION := true
-	VERSION := $(shell git describe --tags --long --dirty --always | \
-		sed 's/v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)-\?.*-\([0-9]*\)-\(.*\)/\1 \2 \3 \4 \5/g')
-	VERSION_MAJOR := $(word 1, $(VERSION))
-	VERSION_MINOR := $(word 2, $(VERSION))
-	VERSION_PATCH := $(word 3, $(VERSION))
-	VERSION_REVISION := $(word 4, $(VERSION))
-	VERSION_HASH := $(word 5, $(VERSION))
-	VERSION_STRING := \
-		"$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH).$(VERSION_REVISION)-$(VERSION_HASH)"
+USE_VERSION := true
+ifeq ($(USE_VERSION), true)
+	GIT_VERSION := $(shell git --no-pager describe --tags --always)
+
+	# If working tree is dirty, append dirty flag
+	ifneq ($(strip $(shell git status --porcelain 2>/dev/null)),)
+		GIT_VERSION := $(GIT_VERSION)-dirty
+	endif
+
 	override CXXFLAGS := $(CXXFLAGS) \
-		-D VERSION_MAJOR=$(VERSION_MAJOR) \
-		-D VERSION_MINOR=$(VERSION_MINOR) \
-		-D VERSION_PATCH=$(VERSION_PATCH) \
-		-D VERSION_REVISION=$(VERSION_REVISION) \
-		-D VERSION_HASH=\"$(VERSION_HASH)\"
+		-D GIT_VERSION=$(GIT_VERSION)
 endif
 
 # Standard, non-optimized release build
 .PHONY: release
 release: dirs
 ifeq ($(USE_VERSION), true)
-	@echo "Beginning release build v$(VERSION_STRING)"
+	@echo "Beginning release build v$(GIT_VERSION)"
 else
 	@echo "Beginning release build"
 endif
@@ -160,7 +152,7 @@ endif
 .PHONY: debug
 debug: dirs
 ifeq ($(USE_VERSION), true)
-	@echo "Beginning debug build v$(VERSION_STRING)"
+	@echo "Beginning debug build v$(GIT_VERSION)"
 else
 	@echo "Beginning debug build"
 endif
