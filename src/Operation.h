@@ -6,10 +6,6 @@
 #include <vector>
 #include <string>
 
-#define DEBUG
-#define deb(x) std::cout<<#x<<" = "<<x<<std::endl;
-#define msg(x) std::cout<<x<<std::endl;
-
 class Operation
 {
     public:
