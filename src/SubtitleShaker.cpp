@@ -363,6 +363,7 @@ int SubtitleShaker::startProccesing(){
     }
     out.push_back(dialogues[0].getString());
     std::string latestDGet;
+    static auto needToProcessCount = needToProcess.size();
     try{
         for (int i = 1; i < dialogues.size(); i++){
             if (i == needToProcess.back()){

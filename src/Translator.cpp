@@ -103,27 +103,19 @@ std::wstring Translator::translate(std::string str){
     std::string string(translateSamples[0].begin(), translateSamples[0].end() - 37);
 
     //convert from utf
-    auto splited = operation.split(string, '\\');
     std::wstring out;
-    out.reserve(splited.size());
-    unsigned char addSymbol = 0;
-    int i = 0;
-    for (auto& it : splited){
-        if (i++ == 0) continue;
-        if (it.size() == 6){
-            addSymbol = it.back();
-            it.resize(it.size() - 1);
+    for (int i = 0; i < string.size(); i++){
+        if (string[i] == '\\' && i + 5 < string.size()){
+            try{
+                out += dictUtf.at(std::string(string.begin() + i, string.begin() + i + 6));
+                i += 5;
+            }
+            catch(...){
+                out += (wchar_t)(string[i]);
+            }
         }
-        it.insert(it.begin(), '\\');
-        try{
-            out += dictUtf.at(it);
-        }
-        catch(...){
-            out += std::wstring(it.begin(), it.end());
-        }
-        if (addSymbol != 0){
-            out += (wchar_t)addSymbol;
-            addSymbol = 0;
+        else{
+            out += (wchar_t)(string[i]);
         }
     }
     return out;
