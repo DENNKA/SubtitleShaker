@@ -1,4 +1,4 @@
-# original https://github.com/mbcrawfo/GenericMakefile 
+# original https://github.com/mbcrawfo/GenericMakefile
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
 BIN_NAME := SubtitleShaker
@@ -9,19 +9,17 @@ SRC_EXT = cpp
 # Path to the source directory, relative to the makefile
 SRC_PATH = ./src
 # Space-separated pkg-config libraries used by this project
-LIBS = 
+LIBS =
 # General compiler flags
 COMPILE_FLAGS = -Wall -Wextra
 # Additional release-specific flags
-#RCOMPILE_FLAGS = -D NDEBUG
-RCOMPILE_FLAGS =
+RCOMPILE_FLAGS = -D NDEBUG
 # Additional debug-specific flags
-#DCOMPILE_FLAGS = -D DEBUG
-DCOMPILE_FLAGS = -g
+DCOMPILE_FLAGS = -g -D DEBUG
 # Add additional include paths
 INCLUDES = -I $(SRC_PATH)
 # General linker settings
-LINK_FLAGS = -lstdc++fs -static -lboost_system -pthread
+LINK_FLAGS = -static -pthread -lstdc++fs -lboost_system -lpthread
 # Additional release-specific linker settings
 RLINK_FLAGS =
 # Additional debug-specific linker settings
@@ -196,8 +194,7 @@ clean:
 	@echo "Deleting $(BIN_NAME) symlink"
 	@$(RM) $(BIN_NAME)
 	@echo "Deleting directories"
-	@$(RM) bin/release/$(BIN_NAME)
-	@$(RM) bin/debug/$(BIN_NAME)
+	@$(RM) -r bin
 	@$(RM) -r build
 
 #@$(RM) -r bin
@@ -205,6 +202,8 @@ clean:
 # Main rule, checks the executable and symlinks to the output
 all: $(BIN_PATH)/$(BIN_NAME)
 	@echo "Making symlink: $(BIN_NAME) -> $<"
+	@echo -n "Number of lines in src/ -> "
+	@cat src/* | wc -l
 	@$(RM) $(BIN_NAME)
 	@ln -s $(BIN_PATH)/$(BIN_NAME) $(BIN_NAME)
 
