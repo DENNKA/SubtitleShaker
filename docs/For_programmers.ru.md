@@ -1,4 +1,4 @@
-# For programmers
+# Для программистов
 
 ## [Contents](README.ru.md)
 

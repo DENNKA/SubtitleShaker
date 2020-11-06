@@ -1,6 +1,6 @@
 # Contributing
 
-## [ENGLISH](CONTRIBUTING.md); НА РУССКОМ;
+## ENGLISH; [НА РУССКОМ](CONTRIBUTING.ru.md);
 <!---
 full line:
 [ENGLISH](CONTRIBUTING.md); [НА РУССКОМ](CONTRIBUTING.ru.md);

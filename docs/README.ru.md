@@ -1,4 +1,4 @@
-# SubtitleShaker documentation
+# SubtitleShaker документация
 
 ## [ENGLISH](README.md); НА РУССКОМ;
 <!---
@@ -10,6 +10,6 @@ full line:
 
 Это главный файл документации
 
-## Contents
-* [Compilation](Compilation.md)
-* [For programmers](For_programmers.md)
+## Содержание
+* [Компиляция](Compilation.ru.md)
+* [Для программистов](For_programmers.ru.md)
