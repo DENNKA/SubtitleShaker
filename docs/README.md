@@ -13,3 +13,5 @@ It's main file of documentation
 ## Contents
 * [Compilation](Compilation.md)
 * [For programmers](For_programmers.md)
+
+## [Contributing](../CONTRIBUTING.md)

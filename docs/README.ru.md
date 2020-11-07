@@ -13,3 +13,5 @@ full line:
 ## Содержание
 * [Компиляция](Compilation.ru.md)
 * [Для программистов](For_programmers.ru.md)
+
+## [Содействие](../CONTRIBUTING.ru.md)
