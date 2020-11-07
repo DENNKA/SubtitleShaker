@@ -18,7 +18,7 @@ std::vector<std::string> Operation::split(std::string str, const char delim){
 
 std::string Operation::uniteStrings(std::vector<std::string> str, const char delim, bool firstAndSecondNoDelim){
     std::string out;
-    for (int i = 0; i < str.size(); i++){
+    for (uint i = 0; i < str.size(); i++){
         out += str[i];
         if (i != str.size() - 1 && !(i == 0 && firstAndSecondNoDelim)){
             out += delim;
@@ -51,7 +51,7 @@ std::string Operation::getTimeStringFromMs(int ms){
     vec.push_back(std::to_string(minutes));
     vec.push_back(std::to_string(seconds));
     vec.push_back(std::to_string(centiseconds));
-    for (int i = 1; i < vec.size(); i++){
+    for (uint i = 1; i < vec.size(); i++){
         if (vec[i].length() == 1){
             vec[i].insert(vec[i].begin(), '0');
         }

@@ -104,7 +104,7 @@ std::wstring Translator::translate(std::string str){
 
     //convert from utf
     std::wstring out;
-    for (int i = 0; i < string.size(); i++){
+    for (uint i = 0; i < string.size(); i++){
         if (string[i] == '\\' && i + 5 < string.size()){
             try{
                 out += dictUtf.at(std::string(string.begin() + i, string.begin() + i + 6));

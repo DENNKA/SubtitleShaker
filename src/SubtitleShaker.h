@@ -23,16 +23,16 @@
 class SubtitleShaker
 {
     public:
-        SubtitleShaker(int argc, char *argv[]);
-        int start();
-        int tryFindFiles();
+        SubtitleShaker();
+        void tryFindFiles();
         void help();
-        int parseSettings();
-        int readFile(const std::string& fileName, std::vector<std::string>& file);  // "file" it is output
-        int writeFile(const std::string& fileName, const std::vector<std::string>& file);
-        int loadSubtitleFileInfo();
-        int loadSettings(std::string fileName);
-        int startProccesing();
+        void parseSettings(int argc, char *argv[]);
+        void parseSettings(std::vector<std::string> argv);
+        void readFile(const std::string& fileName, std::vector<std::string>& file);  // "file" it is output
+        void writeFile(const std::string& fileName, const std::vector<std::string>& file);
+        void loadSubtitleFileInfo();
+        void loadSettings(std::string fileName);
+        void startProccesing();
         virtual ~SubtitleShaker();
 
     protected:
@@ -41,12 +41,11 @@ class SubtitleShaker
         #define SS_MACROS_TO_STRING_2(x) #x
         #define SS_MACROS_TO_STRING(x) SS_MACROS_TO_STRING_2(x)
         const std::string version = SS_MACROS_TO_STRING(GIT_VERSION);
-        int parseArg(std::vector<std::string> argv);
+        void parseArg(std::vector<std::string> argv);
         Operation operation;
         ASSHeader assHeader;
         Translator translator;
         bool verbose = false;
-        std::vector<std::string> argv;
         std::string settingsFile;
         std::string fileOut;
         std::string fileOutPrefix = "MOD_";

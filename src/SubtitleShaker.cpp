@@ -1,29 +1,14 @@
 #include "SubtitleShaker.h"
 
-SubtitleShaker::SubtitleShaker(int argc, char *argv[]){
-    std::vector<std::string> temp(argv, argv + argc);
-    this->argv.swap(temp);
+SubtitleShaker::SubtitleShaker(){
     srand(time(NULL));
-}
-
-int SubtitleShaker::start(){
-    auto state = parseSettings();
-    if (state == 1337) return 0;
-    if (state != 0) return state;
-    state = tryFindFiles();
-    if (state != 0) return state;
-    state = loadSubtitleFileInfo();
-    if (state != 0) return state;
-    state = startProccesing();
-    if (state != 0) return state;
-    return 0;
 }
 
 namespace fs = std::experimental::filesystem;
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-int SubtitleShaker::tryFindFiles(){
+void SubtitleShaker::tryFindFiles(){
     std::wstring directory_name = fs::current_path().wstring();
     std::string extensionAss = ".ass";
     std::string extensionTxt = ".txt";
@@ -64,23 +49,23 @@ int SubtitleShaker::tryFindFiles(){
         if (fileNames.size() == 0){
             debug.error(Lang::en, L"Can't find .ass files\n");
             debug.error(Lang::ru, L"Файлы .ass не найдены\n");
-            return 1;
+            throw 1;
         }
         debug.out(Lang::en, L"Write number subtitles file:\n");
         debug.out(Lang::ru, L"Напиши номер файла субтитров:\n");
-        for (int i = 0; i < fileNames.size(); i++){
+        for (uint i = 0; i < fileNames.size(); i++){
             std::wcout << std::to_wstring(i + 1) << L" " << converter.from_bytes(fileNames[i]) << std::endl;
         }
         int assNumber;
         std::cin >> assNumber;
-        if (assNumber - 1 < fileNames.size()){
+        if (assNumber - 1 < (int)fileNames.size()){
             fileIn = fileNames[assNumber - 1];
             readFile(fileIn, file);
         }
         else{
             debug.error(Lang::en, L"No input file\n");
             debug.error(Lang::ru, L"Нет файла на вход\n");
-            return 1;
+            throw 1;
         }
     }
 
@@ -98,7 +83,7 @@ int SubtitleShaker::tryFindFiles(){
                 }
                 find = true;
             }
-            /*for (int j = 0; j < fileIn.size() - extensionAss.size(); i++){
+            for (int j = 0; j < fileIn.size() - extensionAss.size(); i++){
                 if (fileIn.empty() || j >= settingsFileNames[i].size() - extensionTxt.size() || fileIn[j] != settingsFileNames[i][j]){
                     find = false;
                     break;
@@ -129,12 +114,12 @@ int SubtitleShaker::tryFindFiles(){
     if (settingsFile.empty() && settingsFileNames.size() != 0){
         debug.out(Lang::en, L"Write number settings file:\n0 if don't use settings file\n");
         debug.out(Lang::ru, L"Напиши номер файла настроек:\n0 если не использовать файл настроек\n");
-        for (int i = 0; i < settingsFileNames.size(); i++){
+        for (uint i = 0; i < settingsFileNames.size(); i++){
             std::wcout << std::to_wstring(i + 1) << ' ' << converter.from_bytes(settingsFileNames[i]) << std::endl;
         }
         int txtNumber;
         std::cin >> txtNumber;
-        if (txtNumber != 0 && txtNumber - 1 < settingsFileNames.size()){
+        if (txtNumber != 0 && txtNumber - 1 < (int)settingsFileNames.size()){
             settingsFile = settingsFileNames[txtNumber - 1];
             loadSettings(settingsFile);
         }
@@ -146,8 +131,6 @@ int SubtitleShaker::tryFindFiles(){
         debug.out(Lang::ru, L"Автоматически выбранный файл для вывода:");
         debug.error(fileOut);
     }
-
-    return 0;
 }
 
 void SubtitleShaker::help(){
@@ -219,11 +202,16 @@ void SubtitleShaker::help(){
     #undef outOption
 }
 
-int SubtitleShaker::parseSettings(){
-    return parseArg(argv);
+void SubtitleShaker::parseSettings(int argc, char *argv[]){
+    std::vector<std::string> temp(argv, argv + argc);
+    parseArg(temp);
 }
 
-int SubtitleShaker::readFile(const std::string& fileName, std::vector<std::string>& file){
+void SubtitleShaker::parseSettings(std::vector<std::string> argv){
+    parseArg(argv);
+}
+
+void SubtitleShaker::readFile(const std::string& fileName, std::vector<std::string>& file){
     file.resize(0);
     file.reserve(100);
     std::ifstream fin;
@@ -232,42 +220,40 @@ int SubtitleShaker::readFile(const std::string& fileName, std::vector<std::strin
         debug.error(fileName);
         debug.error(Lang::en, L"file not found\n");
         debug.error(Lang::ru, L"файл не найден\n");
-        return 1;
+        throw 1;
     }
     std::string str;
     while(getline(fin, str)){
         file.push_back(str);
     }
-    return 0;
 }
 
-int SubtitleShaker::writeFile(const std::string& fileName, const std::vector<std::string>& file){
+void SubtitleShaker::writeFile(const std::string& fileName, const std::vector<std::string>& file){
     std::ofstream fout;
     fout.open(fileName);
     if(fileName.empty()){
         debug.error(Lang::en, L"Not setted output file\n");
         debug.error(Lang::ru, L"Не назначен файл вывода\n");
-        return 1;
+        throw 1;
     }
     if(!fout.is_open()){
         debug.error(fileName);
         debug.error(Lang::en, L"file not found\n");
         debug.error(Lang::ru, L"файл не найден\n");
-        return 1;
+        throw 1;
     }
     for (auto& it : file){
         fout<<it<<"\n";
     }
-    return 0;
 }
 
-int SubtitleShaker::loadSubtitleFileInfo(){
+void SubtitleShaker::loadSubtitleFileInfo(){
     if (file.empty()){
         debug.error(Lang::en, L"Input file empty\n");
         debug.error(Lang::ru, L"Входной файл пуст\n");
-        return 1;
+        throw 1;
     }
-    for (int i = 0; i < file.size(); i++){
+    for (uint i = 0; i < file.size(); i++){
         const auto strFull = file[i];
         auto str = file[i];
         /*if (str.compare(0, 9, comparePlayResX) == 0){
@@ -284,7 +270,7 @@ int SubtitleShaker::loadSubtitleFileInfo(){
         ifCompare(textScriptInfo){
             std::vector<std::string> temp;
             temp.reserve(30);
-            for (int j = i; j < file.size(); j++){
+            for (uint j = i; j < file.size(); j++){
                 if (!(file[j].compare(0, textV4.size(), textV4) == 0)){
                     temp.push_back(file[j]);
                 }
@@ -327,22 +313,20 @@ int SubtitleShaker::loadSubtitleFileInfo(){
             dialogues.push_back(Dialog(textComment + ' ',str));
         }
     }
-    return 0;
 }
 
-int SubtitleShaker::loadSettings(std::string fileName){
+void SubtitleShaker::loadSettings(std::string fileName){
     std::vector<std::string> file;
     std::string temp;
-    if(readFile(fileName, file) != 0) return 1;
+    readFile(fileName, file);
     temp.reserve(file.size() * 7);
-    temp.push_back('0 ');
     for (auto& it : file){
         temp += it + "\n ";
     }
-    return parseArg(operation.split(temp, ' '));
+    parseArg(operation.split(temp, ' '));
 }
 
-int SubtitleShaker::startProccesing(){
+void SubtitleShaker::startProccesing(){
     std::vector<std::string> out;
     out.reserve(400);
     out = assHeader.getHeader();
@@ -354,19 +338,18 @@ int SubtitleShaker::startProccesing(){
     if (dialogues.size() == 0){
         debug.error(Lang::en, L"Can't parse dialogs or file not contains they\n");
         debug.error(Lang::ru, L"Невозможно получить диалоги или файл не содержит их\n");
-        return 1;
+        throw 1;
     }
     if (needToProcess.size() == 0){
         debug.error(Lang::en, L"Not setted dialogs to process\n");
         debug.error(Lang::ru, L"На обработку не выбраны диалоги\n");
-        return 1;
+        throw 1;
     }
     out.push_back(dialogues[0].getString());
     std::string latestDGet;
-    static auto needToProcessCount = needToProcess.size();
     try{
-        for (int i = 1; i < dialogues.size(); i++){
-            if (i == needToProcess.back()){
+        for (uint i = 1; i < dialogues.size(); i++){
+            if ((int)i == needToProcess.back()){
                 auto& s = settings[i];
                 #define dGet(x) (s[x])
                 auto dGetInt{[&s, &latestDGet](int x) -> int{
@@ -389,7 +372,7 @@ int SubtitleShaker::startProccesing(){
                 if (assHeader.format[ASSHeader::PlayResX] == "" || assHeader.format[ASSHeader::PlayResY] == ""){
                     debug.error(Lang::en, L"Can't find PlayRes please add video file to subtitles\n");
                     debug.error(Lang::ru, L"Невозможно определить PlayRes добавьте видео файл к субтитрам\n");
-                    return 1;
+                    throw 1;
                 }
                 int x, y;
                 const auto& parseTagPos = dialog.parseAssTag("\\pos", true);
@@ -419,7 +402,7 @@ int SubtitleShaker::startProccesing(){
                         newEnd = end;
                         breakWhile = true;
                     }
-                    for (int i = FirstMode; i < s.size(); i++)
+                    for (uint i = FirstMode; i < s.size(); i++)
                     {
                         struct ArgParse{
                             ArgParse(const std::string& arg, const std::string& argLong) : arg(arg), argLong(argLong){;}
@@ -430,7 +413,7 @@ int SubtitleShaker::startProccesing(){
                         std::vector<ArgParse> parseVector;
                         #define addParse(arg,argLong) parseVector.push_back(ArgParse(arg, argLong));
                         #define parse \
-                        for (int j = i + 1; j < s.size(); j++){\
+                        for (uint j = i + 1; j < s.size(); j++){\
                             if (dGet(j)[0] != '-'/*IS DIGIT CHECK*/) break;\
                             for (auto& it : parseVector){\
                                 if (dGet(j) == it.arg || dGet(j) == it.argLong) {it.parse = dGet(j + 1); j++;}\
@@ -441,9 +424,6 @@ int SubtitleShaker::startProccesing(){
                             dialog.setEndMs(newEnd);
                         }
                         if (dGet(i) == "shake"){
-                            bool modeSettings = true;
-
-
                             //addParse("-f", "--factor")
                             //addParse("-b", "--begin")
                             //addParse("-e", "--end")
@@ -490,7 +470,7 @@ int SubtitleShaker::startProccesing(){
                     dialog = dialogues[i];
                     if (time == 0 || breakWhile) break;
                 }
-                while (needToProcess.back() == i){
+                while (needToProcess.back() == (int)i){
                     needToProcess.pop_back();
                 }
                 #undef parse
@@ -516,15 +496,14 @@ int SubtitleShaker::startProccesing(){
         debug.error(Lang::en, L"Out of range, maybe invalid argument:");
         debug.error(Lang::ru, L"Вне диапозона, возможный неправильный аргумент:");
         debug.error(latestDGet);
-        return 1;
+        throw 1;
     }
     /*catch(std::exception &e){
         std::cerr << "Caught " << e.what() << std::endl;
         std::cerr << "Type " << typeid(e).name() << std::endl;
         return 1;
     }*/
-    if (writeFile(fileOut, out) != 0) return 0;
-    return 0;
+    writeFile(fileOut, out);
 }
 
 SubtitleShaker::~SubtitleShaker()
@@ -537,12 +516,12 @@ SubtitleShaker::~SubtitleShaker()
     return (a.first > b.first);
 }*/
 
-int SubtitleShaker::parseArg(std::vector<std::string> argv){
+void SubtitleShaker::parseArg(std::vector<std::string> argv){
     if (!fileIn.empty()) inputFileLoaded = true;
     int currentString = -1;
     int currentMode = -1;
     int start, end = 0;
-    for (int i = 1; i < argv.size(); i++){
+    for (uint i = 0; i < argv.size(); i++){
         auto it = argv[i];
         auto it2 = i + 1 < argv.size() ? argv[i + 1] : "";
         auto it3 = i + 2 < argv.size() ? argv[i + 2] : "";
@@ -553,7 +532,7 @@ int SubtitleShaker::parseArg(std::vector<std::string> argv){
         }
         if (it == "-h" || it == "--help"){
             help();
-            return 1337;
+            throw 0;
         }
 
         if (it.back() == '\n') it.erase(it.end() - 1); //don't erase argv[i]
@@ -565,7 +544,7 @@ int SubtitleShaker::parseArg(std::vector<std::string> argv){
         }
 
         if (it[0] == '#'){
-            for (int j = i + 1; j < argv.size(); j++){
+            for (uint j = i + 1; j < argv.size(); j++){
                 if (std::count(argv[j].begin(), argv[j].end(), '\n')){
                     i = j;
                     break;
@@ -627,8 +606,7 @@ int SubtitleShaker::parseArg(std::vector<std::string> argv){
         if (it == "-sf" || it == "--settings_file"){
             settingsFile = argv[i + 1];
             if (argv[i + 1] != "0"){
-                auto state = loadSettings(settingsFile);
-                if (state != 0) return state;
+                loadSettings(settingsFile);
             }
             i++;
         } else
@@ -651,7 +629,7 @@ int SubtitleShaker::parseArg(std::vector<std::string> argv){
         } else
         if (it == "--version"){
             std::wcout << std::wstring(version.begin(), version.end()) << std::endl;
-            return 1337;
+            throw 0;
         } else
         if (currentString != -1){
             auto& settingsCurrent = SubtitleShaker::settings[currentString];
@@ -734,5 +712,4 @@ int SubtitleShaker::parseArg(std::vector<std::string> argv){
     }
 
     std::sort(needToProcess.begin(), needToProcess.end(), std::greater<>());
-    return 0;
 }
