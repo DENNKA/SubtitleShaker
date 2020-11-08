@@ -65,8 +65,8 @@ Strings process options:
            -e  --end              Add in end
 
         translate        Translate dialogues
-           -f  --from             Source language
-           -to --to               End language WORK ONLY ru
+           -f  --from             from language
+           -to --to               to language
 
   -q         --quiet   Deleted
 ==============================================================
@@ -117,6 +117,7 @@ Strings process options:
     * **1-100 -m add_str -e addInEnd**  
     Translate:
     * **1-100 -m translate -f ru -to en**  
+    [list of language codes](docs/Language_codes.md)
 
 * Run program:  
  **This is old method, new in fast start section**
