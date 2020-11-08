@@ -1,4 +1,4 @@
-# Language codes
+# Коды языков
 
 ## [Contents](README.ru.md)
 
