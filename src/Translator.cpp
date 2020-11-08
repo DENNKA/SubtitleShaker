@@ -11,8 +11,12 @@ void Translator::setLang(std::string languageFrom, std::string languageTo){
     if (languageTo != ""){
         this->languageTo = languageTo;
         #define pushInDict(x,y) dictUtf.insert(std::make_pair(x, L##y))
-        if (languageTo == "ru"){
-            pushInDict("\\u0430","а");  // лучше не нашел
+        if (true/*languageTo == "ru"*/){
+            // i didn't find better way
+            pushInDict("\\u0454", "є");  // ukrainian
+            pushInDict("\\u0456", "і");
+
+            pushInDict("\\u0430","а");  // russian
             pushInDict("\\u0431","б");
             pushInDict("\\u0432","в");
             pushInDict("\\u0433","г");
@@ -105,6 +109,11 @@ std::wstring Translator::translate(std::string str){
     //convert from utf
     std::wstring out;
     for (uint i = 0; i < string.size(); i++){
+        if (string.compare(i, 5, "&#39;") == 0){ // for '
+            out += '\'';
+            i += 4;
+        }
+        else
         if (string[i] == '\\' && i + 5 < string.size()){
             try{
                 out += dictUtf.at(std::string(string.begin() + i, string.begin() + i + 6));

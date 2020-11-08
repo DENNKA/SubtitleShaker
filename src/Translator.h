@@ -2,6 +2,7 @@
 #define TRANSLATOR_H
 
 #include <string>
+#include <codecvt>
 
 #include "Internet.h"
 #include "Operation.h"

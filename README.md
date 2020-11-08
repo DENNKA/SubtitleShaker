@@ -25,7 +25,7 @@ full line:
 ## [Contributing](CONTRIBUTING.md)
 
 # Description
-subtitleShaker it's a program that make .ass subtitles shaking, add tags in multiple phrases~~, and translate~~ (only on russian)
+subtitleShaker it's a program that make .ass subtitles shaking, add tags in multiple phrases, and translate (can translate from almost any language, but full compatibility only with translation into english, russian and ukrainian)
 
 ## How does it work
 Program add many phrases with tag \move that makes subtitles shaking.  
@@ -66,7 +66,7 @@ Strings process options:
 
         translate        Translate dialogues
            -f  --from             Source language
-           -t0 --to               End language WORK ONLY ru
+           -to --to               End language WORK ONLY ru
 
   -q         --quiet   Deleted
 ==============================================================
@@ -116,9 +116,10 @@ Strings process options:
     Add in end:
     * **1-100 -m add_str -e addInEnd**  
     Translate:
-    * **1-100 -m translate -f en --too ru**  
-    **Translate work only to russian language!!!**
-* Run program:
+    * **1-100 -m translate -f ru -to en**  
+
+* Run program:  
+ **This is old method, new in fast start section**
   1. WINDOWS
       * Shift + Right click in folder
       * Click "open PowerShell window here" or "open command window here" and type with replacement for your parameters:

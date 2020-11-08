@@ -164,7 +164,7 @@ void SubtitleShaker::help(){
         next
         outMode("translate", "Translate dialogues")
         outModeO("-f", "--from", "Source language")
-        outModeO("-t0", "--to", "End language WORK ONLY ru")
+        outModeO("-to", "--to", "End language WORK ONLY ru")
         next
         outOption("-q", "--quiet", "Deleted")
         out("==============================================================")
@@ -192,7 +192,7 @@ void SubtitleShaker::help(){
         next
         outMode("translate", "Перевод диалогов")
         outModeO("-f", "--from", "С языка")
-        outModeO("-t0", "--to", "На язык РАБОТАЕТ ТОЛЬКО ru")
+        outModeO("-to", "--to", "На язык РАБОТАЕТ ТОЛЬКО ru")
         next
         outOption("-q", "--quiet", "Удален")
         out("==============================================================")
@@ -441,7 +441,7 @@ void SubtitleShaker::startProccesing(){
                         } else
                         if (dGet(i) == "translate"){
                             addParse("-f", "--from")
-                            addParse("-t0", "--to")
+                            addParse("-to", "--to")
                             parse;
                             std::string from = parseVector[0].getParse();
                             std::string to = parseVector[1].getParse();
