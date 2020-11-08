@@ -13,6 +13,6 @@ full line:
 ## Содержание
 * [Компиляция](Compilation.ru.md)
 * [Для программистов](For_programmers.ru.md)
-* [Коды языков](Language_codes.md)
+* [Коды языков](Language_codes.ru.md)
 
 ## [Содействие](../CONTRIBUTING.ru.md)
