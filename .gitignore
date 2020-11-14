@@ -1,5 +1,8 @@
 SubtitleShaker
 
+.release_time
+.debug_time
+
 *.txt
 *.ass
 
