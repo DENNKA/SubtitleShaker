@@ -58,9 +58,10 @@ void SubtitleShaker::tryFindFiles(){
         }
         int assNumber;
         std::cin >> assNumber;
-        if (assNumber - 1 < (int)fileNames.size()){
+        if (assNumber - 1 < (int)fileNames.size() && assNumber >= 1){
             fileIn = fileNames[assNumber - 1];
             readFile(fileIn, file);
+            loadSubtitleFileInfo();
         }
         else{
             debug.error(Lang::en, L"No input file\n");
@@ -119,7 +120,7 @@ void SubtitleShaker::tryFindFiles(){
         }
         int txtNumber;
         std::cin >> txtNumber;
-        if (txtNumber != 0 && txtNumber - 1 < (int)settingsFileNames.size()){
+        if (txtNumber != 0 && txtNumber - 1 < (int)settingsFileNames.size() && txtNumber >= 1){
             settingsFile = settingsFileNames[txtNumber - 1];
             loadSettings(settingsFile);
         }
@@ -581,6 +582,21 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
             }
         }
         else
+        if (it == "ALL"){
+            end = dialogues.size() - 1;
+            if (end == -1){
+                debug.error(Lang::en, L"Macros \"ALL\" don't work, because input file not loaded\n");
+                debug.error(Lang::ru, L"Макрос \"ALL\" не работает, потому что входной файл не загруен\n");
+            }
+            start = 1;
+            currentString = start;
+            for (int i = start; i <= end; i++){
+                needToProcess.push_back(i);
+                settings[i].resize(settingsToProcess::End);
+            }
+            continue;
+        }
+        else
         {
             if (std::isdigit(it[1])){
                 auto s = it;
@@ -618,6 +634,7 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
             inputFileLoaded = true;
             fileIn = argv[i + 1];
             readFile(fileIn, file);
+            loadSubtitleFileInfo();
             i++;
         } else
         if (it == "--seed"){
@@ -633,6 +650,7 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
         } else
         if (currentString != -1){
             auto& settingsCurrent = SubtitleShaker::settings[currentString];
+            if (settingsCurrent.size() < settingsToProcess::End) settingsCurrent.resize(settingsToProcess::End);
             #define settings(x, set)\
             if(end == 0){\
                 settings[currentString][x] = set;\

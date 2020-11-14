@@ -8,7 +8,6 @@ int main(int argc, char *argv[]){
     try{
         subtitleShaker.parseSettings(argc, argv);
         subtitleShaker.tryFindFiles();
-        subtitleShaker.loadSubtitleFileInfo();
         subtitleShaker.startProccesing();
 
         state = 0;
