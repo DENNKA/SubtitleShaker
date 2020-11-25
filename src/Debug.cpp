@@ -32,10 +32,9 @@ void Debug::output(std::wostream& out, Lang lang, std::wstring msg){
     }
 }
 
-void Debug::output(std::wostream& out, std::string msg){
-    static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    out << " \"";
-    out << converter.from_bytes(msg);
-    out << "\"";
+void Debug::output(std::wostream& out, std::wstring msg){
+    out << L" \"";
+    out << msg;
+    out << L"\"";
     out << std::endl;
 }

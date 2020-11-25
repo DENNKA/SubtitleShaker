@@ -4,7 +4,7 @@ ASSHeader::ASSHeader(){
     format.resize(FormatEnd);
 }
 
-void ASSHeader::setHeader(std::vector<std::string>& header, std::string version){
+void ASSHeader::setHeader(std::vector<std::wstring>& header, std::wstring version){
     this->header = header;
     bool findedSubtitleShaker = false;
     for (int i = 0; i < header.size(); i++){
@@ -32,13 +32,13 @@ void ASSHeader::setHeader(std::vector<std::string>& header, std::string version)
     }
     if (!findedSubtitleShaker){
         this->header.push_back(textSubtitleShaker);
-        this->header.push_back("Version: " + version);
-        this->header.push_back("Link: github.com/DENNKA/SubtitleShaker.git");
-        this->header.push_back("");
+        this->header.push_back(versionText + version);
+        this->header.push_back(linkText);
+        this->header.push_back(L"");
     }
 }
 
-const std::vector<std::string>& ASSHeader::getHeader(){return header;};
+const std::vector<std::wstring>& ASSHeader::getHeader(){return header;};
 
 ASSHeader::~ASSHeader()
 {

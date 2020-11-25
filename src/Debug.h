@@ -39,7 +39,7 @@ class Debug{
     private:
         Lang lang = Lang::en;
         void output(std::wostream& out, Lang lang, std::wstring msg);
-        void output(std::wostream& out, std::string msg);
+        void output(std::wostream& out, std::wstring msg);
 };
 
 static Debug debug;

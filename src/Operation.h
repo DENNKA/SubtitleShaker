@@ -10,16 +10,16 @@ class Operation
 {
     public:
         Operation();
-        std::vector<std::string> split(std::string str, const char delim);
-        std::string uniteStrings(std::vector<std::string> str, const char delim, bool firstAndSecondNoDelim = false);
-        int getMsFromString(const std::string& str);
-        std::string getTimeStringFromMs(int ms);
+        std::vector<std::wstring> split(std::wstring str, const wchar_t delim);
+        std::wstring uniteStrings(std::vector<std::wstring> str, const char delim, bool firstAndSecondNoDelim = false);
+        int getMsFromString(const std::wstring& str);
+        std::wstring getTimeStringFromMs(int ms);
         virtual ~Operation();
 
     protected:
 
     private:
-        std::vector<std::string> getTimeVector(const std::string& str);
+        std::vector<std::wstring> getTimeVector(const std::wstring& str);
 };
 
 #endif // OPERATION_H

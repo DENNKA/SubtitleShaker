@@ -7,18 +7,19 @@
 #include "Internet.h"
 #include "Operation.h"
 
+#include <iomanip>
+
 class Translator{
     public:
         Translator();
-        void setLang(std::string languageFrom = "", std::string languageTo = "");
-        std::wstring translate(std::string str);
+        void setLang(std::wstring languageFrom = L"", std::wstring languageTo = L"");
+        std::wstring translate(std::wstring str);
     private:
         Internet internet;
         Operation operation;
-        void hexchar(unsigned char c, unsigned char &hex1, unsigned char &hex2);
         std::string urlencode(std::string s);
         std::map<std::string, std::wstring> dictUtf;  // first utf code \u1000 second it's letter wchar_t
-        std::string languageFrom, languageTo;
+        std::wstring languageFrom, languageTo;
 };
 
 #endif //TRANSLATOR_H

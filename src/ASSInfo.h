@@ -1,16 +1,16 @@
 #ifndef ASSINFO_H_INCLUDED
 #define ASSINFO_H_INCLUDED
 
-const std::string textStyle = "Style:";
-const std::string textDialogue = "Dialogue:";
-const std::string textComment = "Comment:";
-const std::string textPlayResX = "PlayResX:";
-const std::string textPlayResY = "PlayResY:";
-const std::string textScriptInfo = "﻿[Script Info]";
-const std::string textAegisub = "[Aegisub";
-const std::string textV4 = "[V4";
-const std::string textEvents = "[Events]";
-const std::string textFormat = "Format:";
-const std::string textSubtitleShaker = "[subtitleShaker]";
+const std::wstring textStyle = L"Style:";
+const std::wstring textDialogue = L"Dialogue:";
+const std::wstring textComment = L"Comment:";
+const std::wstring textPlayResX = L"PlayResX:";
+const std::wstring textPlayResY = L"PlayResY:";
+const std::wstring textScriptInfo = L"﻿[Script Info]";
+const std::wstring textAegisub = L"[Aegisub";
+const std::wstring textV4 = L"[V4";
+const std::wstring textEvents = L"[Events]";
+const std::wstring textFormat = L"Format:";
+const std::wstring textSubtitleShaker = L"[subtitleShaker]";
 
 #endif // ASSINFO_H_INCLUDED

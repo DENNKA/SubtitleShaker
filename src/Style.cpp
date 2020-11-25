@@ -1,13 +1,13 @@
 #include "Style.h"
 
-Style::Style(std::string type, std::string style){
+Style::Style(std::wstring type, std::wstring style){
     const auto& temp = operation.split(style, ',');
     format.reserve(temp.size() + 1);
     format.push_back(type);
     format.insert(format.end(), temp.begin(), temp.end());
 }
 
-std::string Style::getString(){return operation.uniteStrings(format, ',', true);}
+std::wstring Style::getString(){return operation.uniteStrings(format, ',', true);}
 
 std::pair<int, int> Style::calculatePosition(int playResX, int playResY, bool customMargin, int marginL, int marginR, int marginV){
     if (!customMargin){

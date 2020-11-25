@@ -27,11 +27,11 @@ class SubtitleShaker
         void tryFindFiles();
         void help();
         void parseSettings(int argc, char *argv[]);
-        void parseSettings(std::vector<std::string> argv);
-        void readFile(const std::string& fileName, std::vector<std::string>& file);  // "file" it is output
-        void writeFile(const std::string& fileName, const std::vector<std::string>& file);
+        void parseSettings(std::vector<std::wstring> argv);
+        void readFile(const std::wstring& fileName, std::vector<std::wstring>& file);  // "file" it is output
+        void writeFile(const std::wstring& fileName, const std::vector<std::wstring>& file);
         void loadSubtitleFileInfo();
-        void loadSettings(std::string fileName);
+        void loadSettings(std::wstring fileName);
         void startProccesing();
         virtual ~SubtitleShaker();
 
@@ -41,24 +41,24 @@ class SubtitleShaker
         #define SS_MACROS_TO_STRING_2(x) #x
         #define SS_MACROS_TO_STRING(x) SS_MACROS_TO_STRING_2(x)
         const std::string version = SS_MACROS_TO_STRING(GIT_VERSION);
-        void parseArg(std::vector<std::string> argv);
+        void parseArg(std::vector<std::wstring> argv);
         Operation operation;
         ASSHeader assHeader;
         Translator translator;
         bool verbose = false;
-        std::string settingsFile;
-        std::string fileOut;
-        std::string fileOutPrefix = "MOD_";
-        std::string fileIn;
-        std::vector<std::string> file;
-        std::map<std::string, Style> styles;
+        std::wstring settingsFile;
+        std::wstring fileOut;
+        std::wstring fileOutPrefix = L"MOD_";
+        std::wstring fileIn;
+        std::vector<std::wstring> file;
+        std::map<std::wstring, Style> styles;
         std::vector<Style> stylesVector;
         std::vector<Dialog> dialogues;
         bool inputFileLoaded = false;
 
         //vector of pair int (number string) and vector strings (settingsToProcess), vector with settings have size settingsToProcess::End
         std::vector<int> needToProcess;
-        std::map<int, std::vector<std::string>> settings;
+        std::map<int, std::vector<std::wstring>> settings;
         enum settingsToProcess{
             Time,
             IntensityX,

@@ -11,18 +11,18 @@
 class Dialog
 {
     public:
-        Dialog(std::string type, std::string style);
-        std::string getString();
-        std::vector<std::string> format;
+        Dialog(std::wstring type, std::wstring style);
+        std::wstring getString();
+        std::vector<std::wstring> format;
         void setStartMs(int ms);
         void setEndMs(int ms);
         int getStartMs();
         int getEndMs();
-        void addTextInBegin(std::string text);
-        void addTextInEnd(std::string text);
-        void addAssTag(const std::string& tag, const std::vector<int> numbers);
-        void addAssTag(const std::string& tag, const std::vector<std::string> numbers);
-        std::pair<int, std::vector<std::string>> parseAssTag(const std::string& tag, bool erase = false);
+        void addTextInBegin(std::wstring text);
+        void addTextInEnd(std::wstring text);
+        void addAssTag(const std::wstring& tag, const std::vector<int> numbers);
+        void addAssTag(const std::wstring& tag, const std::vector<std::wstring> numbers);
+        std::pair<int, std::vector<std::wstring>> parseAssTag(const std::wstring& tag, bool erase = false);
         enum Format{
             Type,
             Layer,

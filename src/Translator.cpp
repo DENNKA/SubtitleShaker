@@ -4,11 +4,11 @@ Translator::Translator(){
 
 }
 
-void Translator::setLang(std::string languageFrom, std::string languageTo){
-    if (languageFrom != ""){
+void Translator::setLang(std::wstring languageFrom, std::wstring languageTo){
+    if (languageFrom != L""){
         this->languageFrom = languageFrom;
     }
-    if (languageTo != ""){
+    if (languageTo != L""){
         this->languageTo = languageTo;
         #define pushInDict(x,y) dictUtf.insert(std::make_pair(x, L##y))
         if (true/*languageTo == "ru"*/){
@@ -86,18 +86,25 @@ void Translator::setLang(std::string languageFrom, std::string languageTo){
     }
 }
 
-std::wstring Translator::translate(std::string str){
+std::wstring Translator::translate(std::wstring str){
     //https://mymemory.translated.net/doc/spec.php
+
+    //setup converter
+    using convert_type = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_type, wchar_t> converter;
+    //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
+    std::string stringstr = converter.to_bytes(str);
+
     const std::string host = "api.mymemory.translated.net";
-    const std::string target = "/get?q=" + urlencode(str) + "&langpair=" + languageFrom + "|" + languageTo;
+    const std::string target = "/get?q=" + urlencode(stringstr) + "&langpair=" + std::string(languageFrom.begin(), languageFrom.end()) + "|" + std::string(languageTo.begin(), languageTo.end());
     auto response = internet.get(host, target);
     std::size_t found = 1;
     std::vector<std::string> translateSamples;
     while (true){
         found = response.find("translatedText", found + 1);
         found = response.find(':', found + 1);
-        if (found != std::string::npos){
-            std::size_t foundTextBegin = response.find('\"', found + 1);
+        if (found != std::wstring::npos){
+            std::size_t foundTextBegin = response.find(L'\"', found + 1);
             std::size_t foundTextEnd = response.find("match", foundTextBegin + 1);
             translateSamples.push_back(std::string(response, foundTextBegin + 1, foundTextEnd - 1));
             found = foundTextEnd;
@@ -130,41 +137,25 @@ std::wstring Translator::translate(std::string str){
     return out;
 }
 
-void Translator::hexchar(unsigned char c, unsigned char &hex1, unsigned char &hex2){
-    hex1 = c / 16;
-    hex2 = c % 16;
-    hex1 += hex1 <= 9 ? '0' : 'a' - 10;
-    hex2 += hex2 <= 9 ? '0' : 'a' - 10;
-}
+std::string Translator::urlencode(std::string value){
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex;
 
-std::string Translator::urlencode(std::string s){
-    const char *str = s.c_str();
-    std::vector<char> v(s.size());
-    v.clear();
-    for (std::size_t i = 0, l = s.size(); i < l; i++)
-    {
-        char c = str[i];
-        if ((c >= '0' && c <= '9') ||
-            (c >= 'a' && c <= 'z') ||
-            (c >= 'A' && c <= 'Z') ||
-            c == '-' || c == '_' || c == '.' || c == '!' || c == '~' ||
-            c == '*' || c == '\'' || c == '(' || c == ')')
-        {
-            v.push_back(c);
+    for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        std::string::value_type c = (*i);
+
+        // Keep alphanumeric and other accepted characters intact
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << c;
+            continue;
         }
-        else if (c == ' ')
-        {
-            v.push_back('+');
-        }
-        else
-        {
-            v.push_back('%');
-            unsigned char d1, d2;
-            hexchar(c, d1, d2);
-            v.push_back(d1);
-            v.push_back(d2);
-        }
+
+        // Any other characters are percent-encoded
+        escaped << std::uppercase;
+        escaped << '%' << std::setw(2) << int((unsigned char) c);
+        escaped << std::nouppercase;
     }
 
-    return std::string(v.cbegin(), v.cend());
+    return escaped.str();
 }

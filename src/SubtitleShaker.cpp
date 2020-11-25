@@ -10,10 +10,10 @@ static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
 void SubtitleShaker::tryFindFiles(){
     std::wstring directory_name = fs::current_path().wstring();
-    std::string extensionAss = ".ass";
-    std::string extensionTxt = ".txt";
-    std::vector<std::string> fileNames;
-    std::vector<std::string> settingsFileNames;
+    std::wstring extensionAss = L".ass";
+    std::wstring extensionTxt = L".txt";
+    std::vector<std::wstring> fileNames;
+    std::vector<std::wstring> settingsFileNames;
     try // Может быть исключение, например, если папки не существует
     {
         for (auto &p : fs::directory_iterator(directory_name)) // Для всех файлов в папке
@@ -21,7 +21,7 @@ void SubtitleShaker::tryFindFiles(){
             if (!fs::is_regular_file(p.status()))
                 continue; // Пропускаем, если это не простой файл, а папка или что-то другое
 
-            std::string name(p.path().filename().string());
+            std::wstring name(p.path().filename().wstring());
 
             // Проверяем, что имя заканчивается нужным расширением
             // В С++20 можно будет просто `bool match = name.ends_with(extension);`
@@ -54,7 +54,7 @@ void SubtitleShaker::tryFindFiles(){
         debug.out(Lang::en, L"Write number subtitles file:\n");
         debug.out(Lang::ru, L"Напиши номер файла субтитров:\n");
         for (uint i = 0; i < fileNames.size(); i++){
-            std::wcout << std::to_wstring(i + 1) << L" " << converter.from_bytes(fileNames[i]) << std::endl;
+            std::wcout << std::to_wstring(i + 1) << L" " << fileNames[i] << std::endl;
         }
         int assNumber;
         std::cin >> assNumber;
@@ -103,7 +103,7 @@ void SubtitleShaker::tryFindFiles(){
     }*/
     if (settingsFile.empty()){
         for (auto& it : settingsFileNames){
-             if (it == "settings.txt"){
+             if (it == L"settings.txt"){
                  debug.out(Lang::en, L"Auto settings file:");
                  debug.out(Lang::ru, L"Автоматически выбранный файл настроек:");
                  settingsFile = it;
@@ -116,7 +116,7 @@ void SubtitleShaker::tryFindFiles(){
         debug.out(Lang::en, L"Write number settings file:\n0 if don't use settings file\n");
         debug.out(Lang::ru, L"Напиши номер файла настроек:\n0 если не использовать файл настроек\n");
         for (uint i = 0; i < settingsFileNames.size(); i++){
-            std::wcout << std::to_wstring(i + 1) << ' ' << converter.from_bytes(settingsFileNames[i]) << std::endl;
+            std::wcout << std::to_wstring(i + 1) << ' ' << settingsFileNames[i] << std::endl;
         }
         int txtNumber;
         std::cin >> txtNumber;
@@ -204,34 +204,39 @@ void SubtitleShaker::help(){
 }
 
 void SubtitleShaker::parseSettings(int argc, char *argv[]){
-    std::vector<std::string> temp(argv, argv + argc);
+    std::vector<std::string> temp1(argv, argv + argc);
+    std::vector<std::wstring> temp;
+    temp.reserve(argc);
+    for (auto &it : temp1){
+        temp.push_back(std::wstring(it.begin(), it.end()));
+    }
     parseArg(temp);
 }
 
-void SubtitleShaker::parseSettings(std::vector<std::string> argv){
+void SubtitleShaker::parseSettings(std::vector<std::wstring> argv){
     parseArg(argv);
 }
 
-void SubtitleShaker::readFile(const std::string& fileName, std::vector<std::string>& file){
+void SubtitleShaker::readFile(const std::wstring& fileName, std::vector<std::wstring>& file){
     file.resize(0);
     file.reserve(100);
-    std::ifstream fin;
-    fin.open(fileName);
+    std::wifstream fin;
+    fin.open(std::string(fileName.begin(), fileName.end()));
     if(!fin.is_open()){
         debug.error(fileName);
         debug.error(Lang::en, L"file not found\n");
         debug.error(Lang::ru, L"файл не найден\n");
         throw 1;
     }
-    std::string str;
+    std::wstring str;
     while(getline(fin, str)){
         file.push_back(str);
     }
 }
 
-void SubtitleShaker::writeFile(const std::string& fileName, const std::vector<std::string>& file){
-    std::ofstream fout;
-    fout.open(fileName);
+void SubtitleShaker::writeFile(const std::wstring& fileName, const std::vector<std::wstring>& file){
+    std::wofstream fout;
+    fout.open(std::string(fileName.begin(), fileName.end()));
     if(fileName.empty()){
         debug.error(Lang::en, L"Not setted output file\n");
         debug.error(Lang::ru, L"Не назначен файл вывода\n");
@@ -269,14 +274,14 @@ void SubtitleShaker::loadSubtitleFileInfo(){
         #define strErase(x) str.erase(str.begin(), str.begin() + x.size() + 1)
 
         ifCompare(textScriptInfo){
-            std::vector<std::string> temp;
+            std::vector<std::wstring> temp;
             temp.reserve(30);
             for (uint j = i; j < file.size(); j++){
                 if (!(file[j].compare(0, textV4.size(), textV4) == 0)){
                     temp.push_back(file[j]);
                 }
                 else{
-                    assHeader.setHeader(temp, version);
+                    assHeader.setHeader(temp, std::wstring(version.begin(), version.end()));
                     i = j - 1;
                     break;
                 }
@@ -286,49 +291,49 @@ void SubtitleShaker::loadSubtitleFileInfo(){
         ifCompare(textV4){
             auto str2 = file[i + 1];
             str2.erase(str2.begin(), str2.begin() + textFormat.size() + 1);
-            styles.insert(std::make_pair(operation.split(str2, ',')[0], Style(strFull + '\n' + textFormat + ' ', str2)));
-            stylesVector.push_back(Style(strFull + '\n' + textFormat + ' ', str2));
+            styles.insert(std::make_pair(operation.split(str2, L',')[0], Style(strFull + L'\n' + textFormat + L' ', str2)));
+            stylesVector.push_back(Style(strFull + L'\n' + textFormat + L' ', str2));
             i++;
         }
         else
         ifCompare(textStyle){
             strErase(textStyle);
-            styles.insert(std::make_pair(operation.split(str, ',')[0], Style(textStyle + ' ', str)));
-            stylesVector.push_back(Style(textStyle + ' ', str));
+            styles.insert(std::make_pair(operation.split(str, L',')[0], Style(textStyle + L' ', str)));
+            stylesVector.push_back(Style(textStyle + L' ', str));
         }
         else
         ifCompare(textEvents){
             auto str2 = file[i + 1];
             str2.erase(str2.begin(), str2.begin() + textFormat.size() + 1);
-            dialogues.push_back(Dialog(strFull + '\n' + textFormat + ' ', str2));
+            dialogues.push_back(Dialog(strFull + L'\n' + textFormat + L' ', str2));
             i++;
         }
         else
         ifCompare(textDialogue){
             strErase(textDialogue);
-            dialogues.push_back(Dialog(textDialogue + ' ',str));
+            dialogues.push_back(Dialog(textDialogue + L' ',str));
         }
         else
         ifCompare(textComment){
             strErase(textComment);
-            dialogues.push_back(Dialog(textComment + ' ',str));
+            dialogues.push_back(Dialog(textComment + L' ',str));
         }
     }
 }
 
-void SubtitleShaker::loadSettings(std::string fileName){
-    std::vector<std::string> file;
-    std::string temp;
+void SubtitleShaker::loadSettings(std::wstring fileName){
+    std::vector<std::wstring> file;
+    std::wstring temp;
     readFile(fileName, file);
     temp.reserve(file.size() * 7);
     for (auto& it : file){
-        temp += it + "\n ";
+        temp += it + L"\n ";
     }
-    parseArg(operation.split(temp, ' '));
+    parseArg(operation.split(temp, L' '));
 }
 
 void SubtitleShaker::startProccesing(){
-    std::vector<std::string> out;
+    std::vector<std::wstring> out;
     out.reserve(400);
     out = assHeader.getHeader();
     for (auto& it : stylesVector){
@@ -347,7 +352,7 @@ void SubtitleShaker::startProccesing(){
         throw 1;
     }
     out.push_back(dialogues[0].getString());
-    std::string latestDGet;
+    std::wstring latestDGet;
     try{
         for (uint i = 1; i < dialogues.size(); i++){
             if ((int)i == needToProcess.back()){
@@ -355,7 +360,7 @@ void SubtitleShaker::startProccesing(){
                 #define dGet(x) (s[x])
                 auto dGetInt{[&s, &latestDGet](int x) -> int{
                         latestDGet = dGet(x);
-                        return (int)(dGet(x) == "" ? 0 : std::stoi(dGet(x)));
+                        return (int)(dGet(x) == L"" ? 0 : std::stoi(dGet(x)));
                     }
                 };
                 int time = dGetInt(Time);
@@ -364,19 +369,19 @@ void SubtitleShaker::startProccesing(){
                 int intensityX = dGetInt(IntensityX) * 2; // !
                 int intensityY = dGetInt(IntensityY) * 2; // !
                 auto dialog = dialogues[i];
-                #define INT(x) (x == "" ? 0 : std::stoi(x))
+                #define INT(x) (x == L"" ? 0 : std::stoi(x))
                 auto marginL = INT(dialog.format[Dialog::MarginL]);
                 auto marginR = INT(dialog.format[Dialog::MarginR]);
                 auto marginV = INT(dialog.format[Dialog::MarginV]);
                 auto start = dialog.getStartMs();
                 auto end = dialog.getEndMs();
-                if (assHeader.format[ASSHeader::PlayResX] == "" || assHeader.format[ASSHeader::PlayResY] == ""){
+                if (assHeader.format[ASSHeader::PlayResX].empty() || assHeader.format[ASSHeader::PlayResY].empty()){
                     debug.error(Lang::en, L"Can't find PlayRes please add video file to subtitles\n");
                     debug.error(Lang::ru, L"Невозможно определить PlayRes добавьте видео файл к субтитрам\n");
                     throw 1;
                 }
                 int x, y;
-                const auto& parseTagPos = dialog.parseAssTag("\\pos", true);
+                const auto& parseTagPos = dialog.parseAssTag(L"\\pos", true);
                 if (parseTagPos.first == 0){
                     x = INT(parseTagPos.second[0]);
                     y = INT(parseTagPos.second[1]);
@@ -406,13 +411,13 @@ void SubtitleShaker::startProccesing(){
                     for (uint i = FirstMode; i < s.size(); i++)
                     {
                         struct ArgParse{
-                            ArgParse(const std::string& arg, const std::string& argLong) : arg(arg), argLong(argLong){;}
-                            std::string getParse(){return parse;}
+                            ArgParse(const std::wstring& arg, const std::wstring& argLong) : arg(arg), argLong(argLong){;}
+                            std::wstring getParse(){return parse;}
                             int getInt(){if (!parse.empty()) return std::stoi(parse); else return 0;}
-                            std::string arg, argLong, parse;
+                            std::wstring arg, argLong, parse;
                         };
                         std::vector<ArgParse> parseVector;
-                        #define addParse(arg,argLong) parseVector.push_back(ArgParse(arg, argLong));
+                        #define addParse(arg,argLong) parseVector.push_back(ArgParse(L##arg, L##argLong));
                         #define parse \
                         for (uint j = i + 1; j < s.size(); j++){\
                             if (dGet(j)[0] != '-'/*IS DIGIT CHECK*/) break;\
@@ -424,7 +429,7 @@ void SubtitleShaker::startProccesing(){
                             dialog.setStartMs(newStart);
                             dialog.setEndMs(newEnd);
                         }
-                        if (dGet(i) == "shake"){
+                        if (dGet(i) == L"shake"){
                             //addParse("-f", "--factor")
                             //addParse("-b", "--begin")
                             //addParse("-e", "--end")
@@ -436,29 +441,27 @@ void SubtitleShaker::startProccesing(){
                             } while (sqrt((0 - xRand) * (0 - xRand) + (0 - yRand) * (0 - yRand)) > (intensityX + intensityY) / 2); // "circle" random
 
                             std::vector<int> numbers = {prevX, prevY, x + xRand, y + yRand};
-                            dialog.addAssTag("move", numbers);
+                            dialog.addAssTag(L"move", numbers);
                             prevX = x + xRand;
                             prevY = y + yRand;
                         } else
-                        if (dGet(i) == "translate"){
+                        if (dGet(i) == L"translate"){
                             addParse("-f", "--from")
                             addParse("-to", "--to")
                             parse;
-                            std::string from = parseVector[0].getParse();
-                            std::string to = parseVector[1].getParse();
+                            std::wstring from = parseVector[0].getParse();
+                            std::wstring to = parseVector[1].getParse();
                             translator.setLang(from, to);
                             auto get = translator.translate(dialog.format[Dialog::Text]);
-                            typedef std::codecvt_utf8<wchar_t> convert_typeX;
-                            std::wstring_convert<convert_typeX,wchar_t> converterX;
-                            dialog.format[Dialog::Text] = converterX.to_bytes(get);
+                            dialog.format[Dialog::Text] = get;
                             //work in progress
                         } else
-                        if (dGet(i) == "add_str"){
+                        if (dGet(i) == L"add_str"){
                             addParse("-b", "--begin")
                             addParse("-e", "--end")
                             parse;
-                            std::string begin = parseVector[0].getParse();
-                            std::string end = parseVector[1].getParse();
+                            std::wstring begin = parseVector[0].getParse();
+                            std::wstring end = parseVector[1].getParse();
                             dialog.addTextInBegin(begin);
                             dialog.addTextInEnd(end);
                         }
@@ -512,26 +515,26 @@ SubtitleShaker::~SubtitleShaker()
     //dtor
 }
 
-/*bool sortPairback(const std::pair<int, std::vector<std::string>> &a, const std::pair<int, std::vector<std::string>> &b)
+/*bool sortPairback(const std::pair<int, std::vector<std::wstring>> &a, const std::pair<int, std::vector<std::wstring>> &b)
 {
     return (a.first > b.first);
 }*/
 
-void SubtitleShaker::parseArg(std::vector<std::string> argv){
+void SubtitleShaker::parseArg(std::vector<std::wstring> argv){
     if (!fileIn.empty()) inputFileLoaded = true;
     int currentString = -1;
     int currentMode = -1;
     int start, end = 0;
     for (uint i = 0; i < argv.size(); i++){
         auto it = argv[i];
-        auto it2 = i + 1 < argv.size() ? argv[i + 1] : "";
-        auto it3 = i + 2 < argv.size() ? argv[i + 2] : "";
+        auto it2 = i + 1 < argv.size() ? argv[i + 1] : L"";
+        auto it3 = i + 2 < argv.size() ? argv[i + 2] : L"";
 
         #define toInt(x) std::stoi(x)
-        if (it == " " || it.empty() || it == "\n"){
+        if (it == L" " || it.empty() || it == L"\n"){
             continue;
         }
-        if (it == "-h" || it == "--help"){
+        if (it == L"-h" || it == L"--help"){
             help();
             throw 0;
         }
@@ -540,11 +543,11 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
         if (it2.back() == '\n') it2.erase(it2.end() - 1);
         if (it3.back() == '\n') it3.erase(it3.end() - 1);
 
-        if ( it == "-q" || it == "--quiet"){
+        if ( it == L"-q" || it == L"--quiet"){
             continue;
         }
 
-        if (it[0] == '#'){
+        if (it[0] == L'#'){
             for (uint j = i + 1; j < argv.size(); j++){
                 if (std::count(argv[j].begin(), argv[j].end(), '\n')){
                     i = j;
@@ -553,7 +556,7 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
             }
             continue;
         }
-        if (it[0] != '-' && std::isdigit(it[0])){
+        if (it[0] != L'-' && std::isdigit(it[0])){
             auto numbers = operation.split(it, '-');
             if (numbers.size() == 1){
                 int number = toInt(it);
@@ -582,7 +585,7 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
             }
         }
         else
-        if (it == "ALL"){
+        if (it == L"ALL"){
             end = dialogues.size() - 1;
             if (end == -1){
                 debug.error(Lang::en, L"Macros \"ALL\" don't work, because input file not loaded\n");
@@ -611,40 +614,37 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
                     if (del != needToProcess.end()){
                         needToProcess.erase(del);
                     }
-                    else{
-                        if (verbose) std::clog << s << " not setted" << std::endl;
-                    }
                 }
                 continue;
             }
         }
 
-        if (it == "-sf" || it == "--settings_file"){
+        if (it == L"-sf" || it == L"--settings_file"){
             settingsFile = argv[i + 1];
-            if (argv[i + 1] != "0"){
+            if (argv[i + 1] != L"0"){
                 loadSettings(settingsFile);
             }
             i++;
         } else
-        if (it == "-o" || it == "--output"){
+        if (it == L"-o" || it == L"--output"){
             fileOut = argv[i + 1];
             i++;
         } else
-        if ((it == "-i" || it == "--input") && !inputFileLoaded){
+        if ((it == L"-i" || it == L"--input") && !inputFileLoaded){
             inputFileLoaded = true;
             fileIn = argv[i + 1];
             readFile(fileIn, file);
             loadSubtitleFileInfo();
             i++;
         } else
-        if (it == "--seed"){
+        if (it == L"--seed"){
             srand(std::stoll(argv[i + 1]));
             i++;
         } else
-        if (it == "-v" || it == "--verbose"){
+        if (it == L"-v" || it == L"--verbose"){
             verbose = true;
         } else
-        if (it == "--version"){
+        if (it == L"--version"){
             std::wcout << std::wstring(version.begin(), version.end()) << std::endl;
             throw 0;
         } else
@@ -671,31 +671,31 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
                     s.push_back(set);\
                 }\
             }
-            if (it == "-t" || it == "--time"){
+            if (it == L"-t" || it == L"--time"){
                 settings(Time, it2);
             } else
-            if ((it == "-i" || it == "--intensity") && inputFileLoaded){
+            if ((it == L"-i" || it == L"--intensity") && inputFileLoaded){
                 settings(IntensityX, it2)
                 settings(IntensityY, it2)
             } else
-            if (it == "-ix" || it == "--intensity_x"){
+            if (it == L"-ix" || it == L"--intensity_x"){
                 settings(IntensityX, it2)
             } else
-            if (it == "-iy" || it == "--intensity_y"){
+            if (it == L"-iy" || it == L"--intensity_y"){
                 settings(IntensityY, it2)
             } else
-            if (it == "-s" || it == "--shake"){
+            if (it == L"-s" || it == L"--shake"){
                 settings(Time, it2)
-                argv.insert(argv.begin() + (i + 2), "-m");
-                argv.insert(argv.begin() + (i + 3), "shake");
+                argv.insert(argv.begin() + (i + 2), L"-m");
+                argv.insert(argv.begin() + (i + 3), L"shake");
             } else
-            if (it == "-m" || it == "--mode"){
-                if (it2 == "add_str"){  //support old style
+            if (it == L"-m" || it == L"--mode"){
+                if (it2 == L"add_str"){  //support old style
                     if (it3[0] != '-'){
-                        argv.insert(argv.begin() + (i + 2), "-b");
+                        argv.insert(argv.begin() + (i + 2), L"-b");
                     }
                 }
-                if (settingsCurrent[FirstMode] == ""){
+                if (settingsCurrent[FirstMode] == L""){
                     settings(FirstMode, it2)
                     currentMode = FirstMode;
                 }
@@ -704,7 +704,7 @@ void SubtitleShaker::parseArg(std::vector<std::string> argv){
                     currentMode = settingsCurrent.size() - 1;
                 }
             } else
-            if (it[0] == '-'){  //DANGER only in end and only after all else !!!
+            if (it[0] == L'-'){  //DANGER only in end and only after all else !!!
                 if (currentMode != -1)
                 {
                     settingsPushBack(it);

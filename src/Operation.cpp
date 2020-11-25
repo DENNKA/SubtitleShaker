@@ -5,10 +5,10 @@ Operation::Operation()
     //ctor
 }
 
-std::vector<std::string> Operation::split(std::string str, const char delim){
-    std::vector<std::string> elems;
-    std::stringstream ss(str);
-    std::string item;
+std::vector<std::wstring> Operation::split(std::wstring str, const wchar_t delim){
+    std::vector<std::wstring> elems;
+    std::wstringstream ss(str);
+    std::wstring item;
     while(std::getline(ss, item, delim))
     {
         elems.push_back(item);
@@ -16,8 +16,8 @@ std::vector<std::string> Operation::split(std::string str, const char delim){
     return elems;
 }
 
-std::string Operation::uniteStrings(std::vector<std::string> str, const char delim, bool firstAndSecondNoDelim){
-    std::string out;
+std::wstring Operation::uniteStrings(std::vector<std::wstring> str, const char delim, bool firstAndSecondNoDelim){
+    std::wstring out;
     for (uint i = 0; i < str.size(); i++){
         out += str[i];
         if (i != str.size() - 1 && !(i == 0 && firstAndSecondNoDelim)){
@@ -27,7 +27,7 @@ std::string Operation::uniteStrings(std::vector<std::string> str, const char del
     return out;
 }
 
-int Operation::getMsFromString(const std::string& str){
+int Operation::getMsFromString(const std::wstring& str){
     auto timeVector = getTimeVector(str);
     int ms = 0;
     std::vector<int> time;
@@ -38,7 +38,7 @@ int Operation::getMsFromString(const std::string& str){
     return ms;
 }
 
-std::string Operation::getTimeStringFromMs(int ms){
+std::wstring Operation::getTimeStringFromMs(int ms){
     int centiseconds = ms % 1000 / 10;
     ms /= 1000;
     int seconds = ms % 60;
@@ -46,17 +46,17 @@ std::string Operation::getTimeStringFromMs(int ms){
     int minutes = ms % 60;
     int hours = ms / 60;
 
-    std::vector<std::string> vec;
-    vec.push_back(std::to_string(hours));
-    vec.push_back(std::to_string(minutes));
-    vec.push_back(std::to_string(seconds));
-    vec.push_back(std::to_string(centiseconds));
+    std::vector<std::wstring> vec;
+    vec.push_back(std::to_wstring(hours));
+    vec.push_back(std::to_wstring(minutes));
+    vec.push_back(std::to_wstring(seconds));
+    vec.push_back(std::to_wstring(centiseconds));
     for (uint i = 1; i < vec.size(); i++){
         if (vec[i].length() == 1){
             vec[i].insert(vec[i].begin(), '0');
         }
     }
-    return vec[0] + ':' + vec[1] + ':' + vec[2] + '.' + vec[3];
+    return vec[0] + L':' + vec[1] + L':' + vec[2] + L'.' + vec[3];
 }
 
 Operation::~Operation()
@@ -64,7 +64,7 @@ Operation::~Operation()
     //dtor
 }
 
-std::vector<std::string> Operation::getTimeVector(const std::string& str){
+std::vector<std::wstring> Operation::getTimeVector(const std::wstring& str){
     auto time = split(str, ':');
     auto temp = split(time[2], '.');
     time.pop_back();

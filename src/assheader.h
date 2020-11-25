@@ -11,10 +11,10 @@ class ASSHeader
 {
     public:
         ASSHeader();
-        void setHeader(std::vector<std::string>& header, std::string version);
-        const std::vector<std::string>& getHeader();
+        void setHeader(std::vector<std::wstring>& header, std::wstring version);
+        const std::vector<std::wstring>& getHeader();
         virtual ~ASSHeader();
-        std::vector<std::string> format;
+        std::vector<std::wstring> format;
         enum Format{
             PlayResX,
             PlayResY,
@@ -25,7 +25,9 @@ class ASSHeader
 
     private:
         Operation operation;
-        std::vector<std::string> header;
+        std::vector<std::wstring> header;
+        std::wstring versionText = L"Version: ";
+        std::wstring linkText = L"Link: github.com/DENNKA/SubtitleShaker.git";
 };
 
 #endif // ASSHEADER_H

@@ -11,8 +11,8 @@
 class Style
 {
     public:
-        Style(std::string type, std::string style);
-        std::string getString();
+        Style(std::wstring type, std::wstring style);
+        std::wstring getString();
         std::pair<int, int> calculatePosition(int playResX, int playResY, bool customMargin = false, int marginL = 0, int marginR = 0, int marginV = 0);
         virtual ~Style();
 
@@ -20,7 +20,7 @@ class Style
 
     private:
         Operation operation;
-        std::vector<std::string> format;
+        std::vector<std::wstring> format;
         enum Format{
             Type,
             Name,
