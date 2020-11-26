@@ -18,10 +18,12 @@ class Dialog
         void setEndMs(int ms);
         int getStartMs();
         int getEndMs();
+        void insert(int pos, std::wstring text);
         void addTextInBegin(std::wstring text);
         void addTextInEnd(std::wstring text);
-        void addAssTag(const std::wstring& tag, const std::vector<int> numbers);
-        void addAssTag(const std::wstring& tag, const std::vector<std::wstring> numbers);
+        void addAssTag(const std::wstring& tag, const std::vector<int> numbers, int pos = 0);
+        void addAssTag(const std::wstring& tag, const std::vector<int> numbers, const std::wstring& textArg, int pos);
+        void addAssTag(const std::wstring& tag, const std::vector<std::wstring> numbers, int pos = 0);
         std::pair<int, std::vector<std::wstring>> parseAssTag(const std::wstring& tag, bool erase = false);
         enum Format{
             Type,

@@ -32,6 +32,10 @@ int Dialog::getEndMs(){
     return operation.getMsFromString(format[End]);
 }
 
+void Dialog::insert(int pos, std::wstring text){
+    format[Text].insert(pos, text);
+}
+
 void Dialog::addTextInBegin(std::wstring text){
     format[Text].insert(0, text);
 }
@@ -40,17 +44,32 @@ void Dialog::addTextInEnd(std::wstring text){
     format[Text].insert(format[Text].size(), text);
 }
 
-void Dialog::addAssTag(const std::wstring& tag, const std::vector<int> numbers){
+void Dialog::addAssTag(const std::wstring& tag, const std::vector<int> numbers, int pos){
     std::vector<std::wstring> numbersString;
     numbersString.reserve(numbers.size());
     for (auto it : numbers){
         numbersString.push_back(std::to_wstring(it));
     }
-    addAssTag(tag, numbersString);
+    addAssTag(tag, numbersString, pos);
 }
 
-void Dialog::addAssTag(const std::wstring& tag, const std::vector<std::wstring> numbers){
-    addTextInBegin(L"{\\"+ tag + L"(" + operation.uniteStrings(numbers, L',', false) + L")}");
+void Dialog::addAssTag(const std::wstring& tag, const std::vector<int> numbers, const std::wstring& textArg, int pos){
+    std::vector<std::wstring> numbersString;
+    numbersString.reserve(numbers.size() + 1);
+    for (auto it : numbers){
+        numbersString.push_back(std::to_wstring(it));
+    }
+    numbersString.push_back(textArg);
+    addAssTag(tag, numbersString, pos);
+}
+
+void Dialog::addAssTag(const std::wstring& tag, const std::vector<std::wstring> numbers, int pos){
+    std::wstring left = L"", right = L"";
+    if (numbers.size() > 1){
+        left = L"(";
+        right = L")";
+    }
+    insert(pos, L"{\\"+ tag + left + operation.uniteStrings(numbers, L',', false) + right + L"}");
 }
 
 std::pair<int, std::vector<std::wstring>> Dialog::parseAssTag(const std::wstring& tag, bool erase){

@@ -7,7 +7,7 @@ ASSHeader::ASSHeader(){
 void ASSHeader::setHeader(std::vector<std::wstring>& header, std::wstring version){
     this->header = header;
     bool findedSubtitleShaker = false;
-    for (int i = 0; i < header.size(); i++){
+    for (uint i = 0; i < header.size(); i++){
         auto str = header[i];
         /*if (str.c
             auto elems = split(str, ' ');

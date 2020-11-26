@@ -363,18 +363,16 @@ void SubtitleShaker::startProccesing(){
                         return (int)(dGet(x) == L"" ? 0 : std::stoi(dGet(x)));
                     }
                 };
-                int time = dGetInt(Time);
-
-                time -= time % 10;
-                int intensityX = dGetInt(IntensityX) * 2; // !
-                int intensityY = dGetInt(IntensityY) * 2; // !
+                const int time = dGetInt(Time) - dGetInt(Time) % 10;
+                const int intensityX = dGetInt(IntensityX) * 2; // !
+                const int intensityY = dGetInt(IntensityY) * 2; // !
                 auto dialog = dialogues[i];
                 #define INT(x) (x == L"" ? 0 : std::stoi(x))
-                auto marginL = INT(dialog.format[Dialog::MarginL]);
-                auto marginR = INT(dialog.format[Dialog::MarginR]);
-                auto marginV = INT(dialog.format[Dialog::MarginV]);
-                auto start = dialog.getStartMs();
-                auto end = dialog.getEndMs();
+                const auto marginL = INT(dialog.format[Dialog::MarginL]);
+                const auto marginR = INT(dialog.format[Dialog::MarginR]);
+                const auto marginV = INT(dialog.format[Dialog::MarginV]);
+                const auto start = dialog.getStartMs();
+                const auto end = dialog.getEndMs();
                 if (assHeader.format[ASSHeader::PlayResX].empty() || assHeader.format[ASSHeader::PlayResY].empty()){
                     debug.error(Lang::en, L"Can't find PlayRes please add video file to subtitles\n");
                     debug.error(Lang::ru, L"Невозможно определить PlayRes добавьте видео файл к субтитрам\n");
@@ -454,7 +452,51 @@ void SubtitleShaker::startProccesing(){
                             translator.setLang(from, to);
                             auto get = translator.translate(dialog.format[Dialog::Text]);
                             dialog.format[Dialog::Text] = get;
-                            //work in progress
+                        } else
+                        if (dGet(i) == L"rand_symbol"){
+                             addParse("-a", "--add")
+                             addParse("-te", "--time_end")
+                             addParse("-b", "--begin")
+                             parse;
+
+                             const auto text = parseVector[0].getParse();
+                             const auto timeEnd = parseVector[1].getInt();
+                             const auto begin = L"{" + parseVector[2].getParse() + L"}";
+
+                             // find position letters without tags
+                             std::vector<int> pos;
+                             struct AddSettings{
+                                 AddSettings(){};
+                                 AddSettings(int start, int end, std::wstring text) : start(start), end(end), text(text){;}
+                                 int start, end;
+                                 std::wstring text;
+                             };
+                             std::map<int, AddSettings> add;
+                             pos.reserve(dialog.format[Dialog::Text].size());
+                             int posi = 0;
+                             for (auto& it : dialog.format[Dialog::Text]){
+                                 if (std::isspace(it) == 0) {pos.push_back(posi);}
+                                 posi++;
+                             } // if not space add pos
+
+                             dialog.format[Dialog::Text].reserve(dialog.format[Dialog::Text].size() + pos.size() * text.size());
+                             int delay = timeEnd / pos.size(); // find delay
+                             int tstart = 0;
+                             int tend;
+                             auto posCopy = pos;
+                             while (posCopy.size()){ // setup settings every letter
+                                 int random = rand() % posCopy.size();
+                                 tend = tstart + delay;
+                                 add.insert(std::make_pair(posCopy[random], AddSettings(tstart, tend, text)));
+                                 posCopy.erase(posCopy.begin() + random);
+                                 tstart = tend;
+                             }
+                             for (auto it = pos.rbegin(); it != pos.rend(); ++it){ // apply from end
+                                 const AddSettings& as = add.at(*it);
+                                 dialog.addAssTag(L"t", {as.start, as.end}, as.text, *it);
+                                 dialog.insert(*it, begin);
+                                 dialog.addAssTag(L"r", {L""}, *it);
+                             }
                         } else
                         if (dGet(i) == L"add_str"){
                             addParse("-b", "--begin")
