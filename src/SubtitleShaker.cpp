@@ -127,7 +127,14 @@ void SubtitleShaker::tryFindFiles(){
     }
 
     if (fileOut.empty()){
-        fileOut = fileOutPrefix + fileIn;
+        auto it = fileIn.find(L"/");
+        if (it != std::string::npos){
+            fileOut = fileIn;
+            fileOut.insert(it + 1, fileOutPrefix);
+        }
+        else{
+            fileOut = fileOutPrefix + fileIn;
+        }
         debug.out(Lang::en, L"Auto output file:");
         debug.out(Lang::ru, L"Автоматически выбранный файл для вывода:");
         debug.error(fileOut);
