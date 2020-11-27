@@ -332,6 +332,22 @@ void SubtitleShaker::loadSettings(std::wstring fileName){
     std::vector<std::wstring> file;
     std::wstring temp;
     readFile(fileName, file);
+    bool headerFinded = false;
+    for (auto& it : file){
+        if (it.find(textSubtitleShaker) != std::string::npos){
+            headerFinded = true;
+            break;
+        }
+    }
+    if (!headerFinded){
+        std::vector<std::wstring> updateFile;
+        updateFile.push_back(L"# " + textSubtitleShaker);
+        updateFile.push_back(L"# " + versionText + std::wstring(version.begin(), version.end()));
+        updateFile.push_back(L"# " + linkText);
+        updateFile.push_back(L"");
+        updateFile.insert(updateFile.end(), file.begin(), file.end());
+        writeFile(fileName, updateFile);
+    }
     temp.reserve(file.size() * 7);
     for (auto& it : file){
         temp += it + L"\n ";

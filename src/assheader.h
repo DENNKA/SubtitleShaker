@@ -26,8 +26,6 @@ class ASSHeader
     private:
         Operation operation;
         std::vector<std::wstring> header;
-        std::wstring versionText = L"Version: ";
-        std::wstring linkText = L"Link: github.com/DENNKA/SubtitleShaker.git";
 };
 
 #endif // ASSHEADER_H
