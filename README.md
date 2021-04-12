@@ -39,7 +39,7 @@ Program add many phrases with tag \move that makes subtitles shaking.
  * It may ask you which file you need to process just write a number to the console
  * If everything is successful appears file starting with MOD_
  * The file is ready
- * If doesn't work write issue [here](https://github.com/DENNKA/SubtitleShaker/issues/new) or [here in comments to any video](https://www.youtube.com/channel/UCm9PVOWO_FVnEhh3tYxQ2fw) **be sure** to attach your files
+ * If doesn't work write issue [here](https://github.com/DENNKA/SubtitleShaker/issues/new) **be sure** to attach your files
 
 ## Options
 ```
